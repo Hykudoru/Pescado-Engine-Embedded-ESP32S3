@@ -16,7 +16,7 @@ void MuxJoystick::Start()
 {
   //----- MUX joystick setup -------
   rawJoystick.begin();
-  Wire.begin();
+  //Wire.begin();
   mux.begin();
   //force read for potentially bad init readings
   Read();

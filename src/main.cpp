@@ -168,12 +168,12 @@ void Update()
 
 void setup() 
 {
-  //Wire.begin(I2C_SDA, I2C_SCL);
+  Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
   //ptrPot1 = &sendDelay;
   
-  //leftJoystick.Start();
-  //rightJoystick.Start();
+  leftJoystick.Start();
+  rightJoystick.Start();
 
   // INPUT_PULLUP button MUST be connected to GND
   // INPUT_PULLDOWN button MUST be connected to VCC
@@ -207,13 +207,12 @@ void draw()
 void loop() 
 {  
   Time();
-  //Input();
+  Input();
   Physics();
   Update();
   display.fillSprite(TFT_BLACK);
   Draw();
   //Debug();
   display.drawString(String(deltaTime),20,20,4);
-  draw(); 
   lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
 }
