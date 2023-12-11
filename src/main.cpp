@@ -95,6 +95,7 @@ void Init()
 {
     GraphicSettings::matrixMode = true;
     GraphicSettings::displayWireFrames = true;
+    GraphicSettings::fillTriangles = false;
     GraphicSettings::backFaceCulling = true;
     GraphicSettings::debugAxes = true;
     Physics::collisionDetection = false;
@@ -213,6 +214,6 @@ void loop()
   display.fillSprite(TFT_BLACK);
   Draw();
   //Debug();
-  display.drawString(String(deltaTime),20,20,4);
+  display.drawString(String(fps),20,20,4);
   lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
 }

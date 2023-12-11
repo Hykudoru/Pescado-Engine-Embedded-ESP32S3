@@ -46,14 +46,20 @@ void ToScreenCoordinates(Vec3 &vec)
 
 class DrawAPI
 {
+    static long hexColor;
 public:
     static void SetDrawColor(Color color)
     {
         //glColor3ub(color.x, color.y, color.z);
+        int r = color.x;
+        int g = color.y;
+        int b = color.z;
+        SetDrawColor(r, g, b);
     }
 
-    static void SetDrawColor(float r, float g, float b)
+    static void SetDrawColor(int r, int g, int b)
     {
+        hexColor = ((r/255)*TFT_RED) + ((g/255) * TFT_GREEN) + ((b/255) * TFT_BLUE);
         //glColor3ub(r, g, b);
     }
 
@@ -73,7 +79,7 @@ public:
         // glVertex2f(point.x, point.y);
         // glEnd();
         ToScreenCoordinates(point);
-        display.drawPixel(point.x, point.y, TFT_GREEN);
+        display.drawPixel(point.x, point.y, hexColor);
     }
 
     static void DrawLine(Vec3 from, Vec3 to)
@@ -86,7 +92,8 @@ public:
         
         ToScreenCoordinates(from);
         ToScreenCoordinates(to);
-        display.drawLine(from.x, from.y, to.x, to.y, TFT_GREEN);  
+        
+        display.drawLine(from.x, from.y, to.x, to.y, hexColor);  
     }
 
     static void DrawTriangle(Vec3 p1, Vec3 p2, Vec3 p3)
@@ -116,6 +123,8 @@ public:
         // glEnd();
     }
 };
+long DrawAPI::hexColor = 0xFFFFFF;
+
 
 //-----------GRAPHICS---------------
 struct GraphicSettings
