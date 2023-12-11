@@ -160,7 +160,10 @@ void Init()
 
 void Update()
 {
-   
+   float rotationSpeed = (PI / 2) * deltaTime;
+  cube2.rotation = Matrix3x3::RotX(rotationSpeed) * cube2.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+  cube3.rotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+  cube4.rotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
 }
 
 void setup() 
@@ -168,6 +171,7 @@ void setup()
   //Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
   //ptrPot1 = &sendDelay;
+  
   //leftJoystick.Start();
   //rightJoystick.Start();
 
@@ -202,11 +206,11 @@ void draw()
 // Press Reset
 void loop() 
 {  
-  display.fillSprite(TFT_BLACK);
   Time();
   //Input();
-  //Physics();
-  //Update();
+  Physics();
+  Update();
+  display.fillSprite(TFT_BLACK);
   Draw();
   //Debug();
   display.drawString(String(deltaTime),20,20,4);
