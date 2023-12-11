@@ -102,8 +102,8 @@ void Init()
     
     //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
     //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
-    CubeMesh* cube = new CubeMesh(1, Vec3());
-    cube->position += Direction::forward;
+   // CubeMesh* cube = new CubeMesh(1, Vec3());
+   // cube->position += Direction::forward;
 
 /*
     planet = LoadMeshFromOBJFile("Sphere.obj");
@@ -186,42 +186,30 @@ void setup()
   lcd_setRotation(1);
   display.createSprite(536, 240);
   display.setSwapBytes(1);
-/*
-  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  oled.display();//displays initial adafruit image
-  oled.clearDisplay();//clears initial adafruit image
-  oled.setTextSize(1);
-  oled.setTextColor(SSD1306_WHITE);
-  oled.setCursor(0, 0);
-  oled.println("");
-  oled.display();
-  oled.clearDisplay();
-*/
-  //u8g2.begin();
 
-  //Init();
+  Init();
  }
+void draw()
+{
+  display.drawLine(536/2, 240/2, (536/2), (240/2)+100, TFT_YELLOW);  
+  display.drawLine(536/2, 240/2, (536/2)+100, (240/2), TFT_RED); 
+}
 
+// Compile
+// Plug in USB
+// (While program running) Hold Boot, Hold Reset, Release Reset, Release Boot
+// Upload
+// Press Reset
 void loop() 
 {  
-
-display.fillSprite(TFT_BLACK);
-display.drawString("Hello World",20,20,4);
-display.fillRect(10,100,60,60,TFT_RED);
-display.fillRect(80,100,60,60,TFT_GREEN);
-display.fillRect(150,100,60,60,TFT_BLUE);
- 
- lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
-/*
-  Time();
-  Input();
-  Physics();
-  Update();
-  //u8g2.clearBuffer();
   display.fillSprite(TFT_BLACK);
+  Time();
+  //Input();
+  //Physics();
+  //Update();
   Draw();
-  Debug();
+  //Debug();
+  display.drawString(String(deltaTime),20,20,4);
+  draw(); 
   lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
-  //u8g2.sendBuffer();
-  */
 }
