@@ -93,14 +93,16 @@ static CubeMesh cube4 = CubeMesh(1, Vec3(5, 5, -30));
 
 void Init()
 {
-    GraphicSettings::matrixMode = true;
-    GraphicSettings::displayWireFrames = true;
-    GraphicSettings::fillTriangles = false;
+   //GraphicSettings::matrixMode = true;
+   GraphicSettings::lighting = false;
+   GraphicSettings::displayWireFrames = true;
     GraphicSettings::backFaceCulling = true;
     GraphicSettings::debugAxes = true;
     Physics::collisionDetection = false;
     FOV(60);
-    
+    cube2.color = &RGB::green;
+    cube3.color = &RGB::red;
+    cube4.color = &RGB::yellow;
     //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
     //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
    // CubeMesh* cube = new CubeMesh(1, Vec3());

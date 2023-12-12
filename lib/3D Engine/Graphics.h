@@ -112,6 +112,7 @@ public:
         DrawLine(p1, p2);
         DrawLine(p2, p3);
         DrawLine(p3, p1);
+
     }
 
     static void DrawTriangleFilled(Vec3 p1, Vec3 p2, Vec3 p3)
@@ -121,6 +122,14 @@ public:
         // glVertex2f(p2.x, p2.y);
         // glVertex2f(p3.x, p3.y);
         // glEnd();
+        DrawLine(p1, p2);
+        DrawLine(p2, p3);
+        DrawLine(p3, p1);
+        ToScreenCoordinates(p1);
+        ToScreenCoordinates(p2);
+        ToScreenCoordinates(p3);
+        display.drawTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, hexColor);
+        display.fillTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, hexColor);
     }
 };
 long DrawAPI::hexColor = 0xFFFFFF;
