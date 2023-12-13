@@ -113,6 +113,116 @@ static void Input()
     {
         //FOV(fieldOfViewDeg-5);
     }
+
+    
+//---------SERIAL INPUT-------------
+  if(Serial.available())
+  {
+    char key = Serial.read();
+    Serial.println(key);
+    
+    switch (key)
+    {
+    //Reset Camera
+    case '0':
+        Camera::main->rotation = Identity3x3;
+        Camera::main->position = Vec3();
+        break;
+    //Switch Cameras
+    case '1':
+      Camera::main = Camera::cameras[1];
+      break;
+    case '2':
+        Camera::main = Camera::cameras[2];
+        break;
+    case '3':  //Outsider perspective cam
+        CameraSettings::outsiderViewPerspective = !CameraSettings::outsiderViewPerspective;
+        Camera::projector->rotation = Identity3x3;
+        Camera::projector->position = Vec3();
+        break;
+    //------------------Spawn-------------------
+    case '9':  //Cube
+        {
+            Mesh* mesh = new CubeMesh();//LoadMeshFromOBJFile("Objects/Sphere.obj");
+            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
+            mesh->rotation = Camera::main->rotation;
+        }
+        break;
+    case '8':  //Sphere
+        {
+            Mesh* mesh = LoadMeshFromOBJFile("Sphere.obj");
+            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
+            mesh->rotation = Camera::main->rotation;
+            break;
+        }
+    case '7':  //Diamond
+        {
+            Mesh* mesh = LoadMeshFromOBJFile("Diamond.obj");
+            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
+            mesh->rotation = Camera::main->rotation;
+            mesh->scale *= 0.1;
+            mesh->color = &RGB::red;
+        }
+      break;
+    case '6':  //Icosahedron
+        {
+            Mesh* mesh = LoadMeshFromOBJFile("Icosahedron.obj");
+            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
+            mesh->rotation = Camera::main->rotation;
+            mesh->scale *= 0.1;
+            mesh->color = &RGB::purple;
+        }
+      break;
+    //------------------Physics-------------------
+    //Toggle Momentum
+    case 'x': 
+        velocity = Vec3(0, 0, 0);//Reset every toggle state
+        isKinematic = !isKinematic;
+        break;
+    //Toggle Inertial Dampeners
+    case 'z':  
+        dampenersActive = !dampenersActive;
+        break;
+    //Toggle Collision Detection
+    case 'p':  
+        Physics::collisionDetection = !Physics::collisionDetection;
+        break;
+    //Toggle Gravity
+    case 'g':  
+        Physics::gravity = !Physics::gravity;
+        break;
+    //-------------------Debugging------------------------
+    case 'i':
+        GraphicSettings::invertNormals = !GraphicSettings::invertNormals;  
+        break;
+    case 'n':
+        GraphicSettings::debugNormals = !GraphicSettings::debugNormals;
+        break;
+    case 'v': 
+        GraphicSettings::backFaceCulling = !GraphicSettings::backFaceCulling;
+        break;
+    case 'f': 
+        GraphicSettings::fillTriangles = !GraphicSettings::fillTriangles;
+        break;
+    case 'm': 
+        GraphicSettings::displayWireFrames = !GraphicSettings::displayWireFrames;
+        break;
+    case ',': 
+        GraphicSettings::debugAxes = !GraphicSettings::debugAxes;
+        break;
+    case 'l': 
+        GraphicSettings::lighting = !GraphicSettings::lighting;
+        break;
+    case '4': 
+        GraphicSettings::vfx = !GraphicSettings::vfx;
+        break;
+    case '5': 
+        GraphicSettings::matrixMode = !GraphicSettings::matrixMode;
+        break;
+    default:
+      break;
+    }
+  }
 }
 
 #endif

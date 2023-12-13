@@ -97,9 +97,9 @@ Vector3<float> MuxJoystick::Read(int distanceRadius)
   isPressed = !rawJoystick.getButton();
   vec3.z = isPressed;
 
-  Serial.println(String("Joystick_")+muxPort
-  +" <x:"+vec3.x+", y:"+vec3.y+">"+"  pressed:"+(int)(isPressed)
-  +" \t raw: <x:"+rawX+", y:"+rawY+">  pressed:"+rawJoystick.getButton());
+  // Serial.println(String("Joystick_")+muxPort
+  // +" <x:"+vec3.x+", y:"+vec3.y+">"+"  pressed:"+(int)(isPressed)
+  // +" \t raw: <x:"+rawX+", y:"+rawY+">  pressed:"+rawJoystick.getButton());
   
   mux.disablePort(muxPort);
   

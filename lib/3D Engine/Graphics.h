@@ -861,6 +861,155 @@ public:
 
 Mesh* LoadMeshFromOBJFile(string objFileName) 
 {
+
+
+//   if (!SPIFFS.begin(true))
+//   {
+//     Serial.println("Failed while mounting SPIFFS.");
+//     return;
+//   }
+  
+  File file = SPIFFS.open("/Diamond.obj", "r");
+  if (!file) {
+    Serial.println("Failed to open file.");
+  } else {
+    Serial.println("Opened file.");
+  }
+
+  Serial.println("Reading file...");
+  while(file.available()) {
+    char c = file.read();
+    // Serial.write(c);
+    Serial.println(c);
+  }
+  file.close();
+//---------------------------------
+
+    static string filePath = "/";
+
+    string mtlFileName = "";
+    File mtlFile;
+
+    // ----------- Read object file -------------
+    List<string> strings;
+    string line;
+    //std::ifstream objFile;
+    //objFile.open(filePath+objFileName);
+    File objFile = SPIFFS.open("/Diamond.obj", "r");
+    if (objFile)//if (objFile.is_open())
+    {
+        while (file.available()) 
+        {
+            // 1st. Gets the next line.
+            // 2nd. Seperates each word from that line then stores each word into the strings array.
+            line = objFile.readStringUntil('\n').c_str();
+            string word;
+            stringstream ss(line);
+            while (getline(ss, word, ' ')) 
+            {
+                if (word == "mtllib") {
+                    getline(ss, word, ' ');
+                    mtlFileName = word;
+                }
+                else {
+                    strings.emplace_back(word);
+                }
+            }
+        }
+    }
+    objFile.close();
+
+    // -----------------Construct new mesh-------------------
+    Mesh* mesh = new Mesh();
+    List<Vec3>* verts = new List<Vec3>();
+    List<int>* indices = new List<int>();
+    List<Triangle>* triangles = new List<Triangle>(indices->size() / 3);
+    Material material;
+    material.color = Color(255, 255, 255);
+
+    for (size_t i = 0; i < strings.size(); i++)
+    {
+        // v = vertex
+        // f = face
+        string objFileSubString = strings[i];
+        
+        // if .obj encounters "usemtl" then the next string will be material id.
+       if (false) {/* if (objFileSubString == "usemtl")
+        {
+            // Try opening Material file to see if it exists
+            String mtlPathFile = String(filePath) + mtlFileName;
+            mtlFile = SPIFFS.open(mtlPathFile);
+            // check if using material before looking for material key words
+            if (mtlFile.available()) 
+            {
+                string mtlID = strings[++i];
+                bool mtlIDFound = false;
+                //materials->emplace_back(Material(materialID));
+                // search .mtl for material properties under the the current materialID
+                while (!mtlIDFound && mtlFile) 
+                {
+                    // 1st. Gets the next line.
+                    // 2nd. Seperates each word from that line then stores each word into the strings array.
+                    getline(mtlFile, line);
+                    string word;
+                    stringstream ss(line);
+                    while (!mtlIDFound && getline(ss, word, ' '))
+                    {    
+                        if (word == "newmtl")
+                        { 
+                            getline(ss, word, ' ');
+                            if (mtlID == word) {
+                                material.name = word;
+                            }
+                        }
+                        else if (mtlID == material.name && word == "Kd") {
+                            getline(ss, word, ' ');
+                            float r = stof(word);
+                            getline(ss, word, ' ');
+                            float g = stof(word);
+                            getline(ss, word, ' ');
+                            float b = stof(word);
+                            material.color = Color(255*r, 255*g, 255*b);
+
+                            mtlIDFound = true;
+                        }
+                    }
+                }
+                mtlFile.close();
+            }*/
+        }
+
+        else if (objFileSubString == "v") {
+            float x = stof(strings[++i]);
+            float y = stof(strings[++i]);
+            float z = stof(strings[++i]);
+            verts->emplace_back(Vec3(x, y, z));
+        }
+        //f means the next 3 strings will be the indices for mapping vertices
+        else if (objFileSubString == "f") {
+            int p3Index = stof(strings[++i]) - 1;
+            int p2Index = stof(strings[++i]) - 1;
+            int p1Index = stof(strings[++i]) - 1;
+
+            indices->emplace_back(p1Index);
+            indices->emplace_back(p2Index);
+            indices->emplace_back(p3Index);
+
+            Triangle tri = Triangle((*verts)[p1Index], (*verts)[p2Index], (*verts)[p3Index]);
+            tri.color = material.color;
+            triangles->emplace_back(tri);
+        }
+    }
+
+    mesh->vertices = verts;
+    mesh->indices = indices;
+    mesh->triangles = triangles;
+
+    return mesh;
+}
+/*
+Mesh* LoadMeshFromOBJFile(string objFileName) 
+{
     static string filePath = "./Objects/";
 
     string mtlFileName = "";
@@ -979,7 +1128,7 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
 
     return mesh;
 }
-
+*/
 void Draw()
 {
     // Camera TRInverse = (TR)^-1 = R^-1*T^-1 = M = Mcw = World to Camera coords. 

@@ -1,3 +1,5 @@
+#include <FS.h>
+#include <SPIFFS.h>
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -6,11 +8,24 @@
 #include <U8g2lib.h>
 #include <rm67162.h>
 #include <TFT_eSPI.h>
+
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <math.h>
+
 //Alex Lib
 #include <Functions.h>
 #include <Vector.h>
 #include <MuxJoystick.h>
 #include <3D Engine.h>
+#include <Matrix.h>
+#include <Graphics.h>
+#include <Physics.h>
+#include <Input.h>
+using namespace std;
 
 const int BAUD_RATE = 115200;
 //#define BUTTON_1 32//27
@@ -27,30 +42,11 @@ pointerFunction ptrMode;
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite display = TFT_eSprite(&tft);
-/*
-#define OLED_RESET 17
-#define OLED_SCK_SCL 5
-#define OLED_MOSI_SDA 18//23
-#define OLED_DC 19 //MISO?
-#define OLED_CS 16
-U8G2_SH1106_128X64_NONAME_F_4W_SW_SPI u8g2(U8G2_R0, OLED_SCK_SCL, OLED_MOSI_SDA, OLED_CS, OLED_DC, OLED_RESET);
-Adafruit_SSD1306 oled = Adafruit_SSD1306(128, 32, &Wire);
-*/
+
 const int LEFT_JOYSTICK_MUX_PORT = 0;
-const int RIGHT_JOYSTICK_MUX_PORT = 7;
+const int RIGHT_JOYSTICK_MUX_PORT = 3;
 MuxJoystick leftJoystick(LEFT_JOYSTICK_MUX_PORT, false, false);
 MuxJoystick rightJoystick(RIGHT_JOYSTICK_MUX_PORT, false, false);
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <math.h>
-#include <Matrix.h>
-#include <Graphics.h>
-#include <Physics.h>
-#include <Input.h>
-using namespace std;
 
 
 // Checking if DEBUGGING true in other scripts before using cout also ensures readable slow incremental output.
@@ -113,7 +109,8 @@ void Init()
     planet->scale = Vec3(500, 500, 500);
     planet->position += Direction::forward * 1000;
     planet->color = &RGB::white;
-    
+    */
+    /*
     textHelloWorld = LoadMeshFromOBJFile("Hello3DWorldText.obj");
     textHelloWorld->scale = Vec3(2, 2, 2);
     textHelloWorld->position = Vec3(0, 0, -490);
@@ -164,13 +161,47 @@ void Init()
 void Update()
 {
    float rotationSpeed = (PI / 2) * deltaTime;
-  cube2.rotation = Matrix3x3::RotX(rotationSpeed) * cube2.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-  cube3.rotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-  cube4.rotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube2.rotation = Matrix3x3::RotX(rotationSpeed) * cube2.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube3.rotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube4.rotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+}
+
+TaskHandle_t Core0Task;
+TaskHandle_t Core1Task;
+
+void Core0(void * param)
+{
+  for(;;) 
+  {
+    Input();
+  }
+}
+
+void Core1(void * param)
+{
+  for(;;) 
+  {
+    Time();
+    // Input();
+    Physics();
+    Update();
+    display.fillSprite(TFT_BLACK);
+    Draw();//Debug();
+    display.drawString(String(fps),20,20,4);
+    lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
+  }
 }
 
 void setup() 
 {
+  Serial.begin(BAUD_RATE);
+
+  if (!SPIFFS.begin(true))
+  {
+    Serial.println("Failed while mounting SPIFFS.");
+    return;
+  }
+  
   Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
   //ptrPot1 = &sendDelay;
@@ -195,12 +226,27 @@ void setup()
   display.setSwapBytes(1);
 
   Init();
+  
+  xTaskCreatePinnedToCore(
+    Core0, // TaskFunction_t
+    "Core 0 Task", // name of task
+    10000, // stack size in words
+    NULL, // task params
+    1, //Priority
+    &Core0Task, // TaskHandle_t
+    0 // core
+  );
+
+  xTaskCreatePinnedToCore(
+    Core1, // TaskFunction_t
+    "Core 1 Task", // name of task
+    10000, // stack size in words
+    NULL, // task params
+    1, //Priority
+    &Core1Task, // TaskHandle_t
+    1 // core
+  );
  }
-void draw()
-{
-  display.drawLine(536/2, 240/2, (536/2), (240/2)+100, TFT_YELLOW);  
-  display.drawLine(536/2, 240/2, (536/2)+100, (240/2), TFT_RED); 
-}
 
 // Compile
 // Plug in USB
@@ -209,13 +255,4 @@ void draw()
 // Press Reset
 void loop() 
 {  
-  Time();
-  Input();
-  Physics();
-  Update();
-  display.fillSprite(TFT_BLACK);
-  Draw();
-  //Debug();
-  display.drawString(String(fps),20,20,4);
-  lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
 }
