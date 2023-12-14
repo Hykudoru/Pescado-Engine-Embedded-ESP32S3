@@ -89,18 +89,17 @@ static CubeMesh cube4 = CubeMesh(1, Vec3(5, 5, -30));
 
 void Init()
 {
-   //GraphicSettings::matrixMode = true;
-   GraphicSettings::lighting = false;
-   GraphicSettings::displayWireFrames = true;
-    GraphicSettings::backFaceCulling = true;
-    GraphicSettings::debugAxes = true;
-    Physics::collisionDetection = false;
-    FOV(60);
-    cube2.color = &RGB::green;
-    cube3.color = &RGB::red;
-    cube4.color = &RGB::yellow;
-    //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
-    //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
+  GraphicSettings::matrixMode = true;
+  GraphicSettings::lighting = false;
+  GraphicSettings::displayWireFrames = true;
+  GraphicSettings::debugAxes = true;
+  Physics::collisionDetection = false;
+  FOV(60);
+  cube2.color = &RGB::green;
+  cube3.color = &RGB::red;
+  cube4.color = &RGB::yellow;
+  //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
+  //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
    // CubeMesh* cube = new CubeMesh(1, Vec3());
    // cube->position += Direction::forward;
 
@@ -109,23 +108,25 @@ void Init()
     planet->scale = Vec3(500, 500, 500);
     planet->position += Direction::forward * 1000;
     planet->color = &RGB::white;
-    */
-    /*
+    
     textHelloWorld = LoadMeshFromOBJFile("Hello3DWorldText.obj");
     textHelloWorld->scale = Vec3(2, 2, 2);
     textHelloWorld->position = Vec3(0, 0, -490);
     textHelloWorld->color = &RGB::green;
     
+    */
+    
     spaceShip = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
     spaceShip->position = Direction::left * 30 + Direction::forward * 10;
 
+/*
     spaceShip2 = LoadMeshFromOBJFile("SpaceShip_3.obj");
     spaceShip2->position = Direction::right * 40 + Direction::forward * 100;
     spaceShip2->rotation = Matrix3x3::RotY(PI);
 
     spaceShip3 = LoadMeshFromOBJFile("SpaceShip_5.obj");
     spaceShip3->position = Direction::right * 20 + Direction::up * 10;
-
+ 
     Mesh* parent = new CubeMesh();
     Mesh* child = new CubeMesh();
     Mesh* grandchild = new CubeMesh();
@@ -174,6 +175,7 @@ void Core0(void * param)
   for(;;) 
   {
     Input();
+    //Debug();
   }
 }
 
@@ -182,7 +184,7 @@ void Core1(void * param)
   for(;;) 
   {
     Time();
-    // Input();
+    //Input();
     Physics();
     Update();
     display.fillSprite(TFT_BLACK);
@@ -195,13 +197,13 @@ void Core1(void * param)
 void setup() 
 {
   Serial.begin(BAUD_RATE);
-
+/*
   if (!SPIFFS.begin(true))
   {
-    Serial.println("Failed while mounting SPIFFS.");
+    Serial.println("Failed while mounting SPIFFS.");0
     return;
   }
-  
+  */
   Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
   //ptrPot1 = &sendDelay;
@@ -242,7 +244,7 @@ void setup()
     "Core 1 Task", // name of task
     10000, // stack size in words
     NULL, // task params
-    1, //Priority
+    17, //Priority
     &Core1Task, // TaskHandle_t
     1 // core
   );

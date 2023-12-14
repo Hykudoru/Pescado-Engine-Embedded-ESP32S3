@@ -869,20 +869,6 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
 //     return;
 //   }
   
-  File file = SPIFFS.open("/Diamond.obj", "r");
-  if (!file) {
-    Serial.println("Failed to open file.");
-  } else {
-    Serial.println("Opened file.");
-  }
-
-  Serial.println("Reading file...");
-  while(file.available()) {
-    char c = file.read();
-    // Serial.write(c);
-    Serial.println(c);
-  }
-  file.close();
 //---------------------------------
 
     static string filePath = "/";
@@ -895,14 +881,16 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
     string line;
     //std::ifstream objFile;
     //objFile.open(filePath+objFileName);
-    File objFile = SPIFFS.open("/Diamond.obj", "r");
+    File objFile = SPIFFS.open((filePath+objFileName).c_str(), "r");
     if (objFile)//if (objFile.is_open())
     {
-        while (file.available()) 
+        while (objFile.available()) 
         {
             // 1st. Gets the next line.
             // 2nd. Seperates each word from that line then stores each word into the strings array.
-            line = objFile.readStringUntil('\n').c_str();
+            String l = objFile.readStringUntil('\n');
+            line = l.c_str();
+            Serial.println(l);
             string word;
             stringstream ss(line);
             while (getline(ss, word, ' ')) 

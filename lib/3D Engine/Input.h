@@ -120,7 +120,10 @@ static void Input()
   {
     char key = Serial.read();
     Serial.println(key);
-    
+    if (key == ' ')
+    {
+        return;
+    }
     switch (key)
     {
     //Reset Camera
@@ -142,11 +145,21 @@ static void Input()
         break;
     //------------------Spawn-------------------
     case '9':  //Cube
-        {
-            Mesh* mesh = new CubeMesh();//LoadMeshFromOBJFile("Objects/Sphere.obj");
-            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
-            mesh->rotation = Camera::main->rotation;
-        }
+       { 
+            Mesh* mesh = nullptr;
+            try {
+                mesh = new CubeMesh();//LoadMeshFromOBJFile("Objects/Sphere.obj");
+            }
+            catch(const std::exception& e)
+            {
+                Serial.println(e.what());
+            }
+            if (mesh != nullptr) {
+                mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
+                mesh->rotation = Camera::main->rotation;
+            }
+
+       }
         break;
     case '8':  //Sphere
         {
