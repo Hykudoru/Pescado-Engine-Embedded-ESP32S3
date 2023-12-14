@@ -93,6 +93,7 @@ void Init()
   GraphicSettings::matrixMode = true;
   GraphicSettings::lighting = false;
   GraphicSettings::displayWireFrames = true;
+  GraphicSettings::fillTriangles = false;
   GraphicSettings::debugAxes = true;
   Physics::collisionDetection = false;
   FOV(60);
@@ -186,10 +187,6 @@ void Core0(void * param)
     Input();
     Physics();
     Update();
-    /*display.fillSprite(TFT_BLACK);
-    Draw();//Debug();
-    display.drawString(String(fps),20,20,4);
-    lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());*/
   }
 }
 
@@ -210,7 +207,7 @@ void setup()
 {
   Serial.begin(BAUD_RATE);
 
-  if (!SPIFFS.begin(true))
+  if (!SPIFFS.begin())
   {
     Serial.println("Failed while mounting SPIFFS.");
   }
