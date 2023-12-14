@@ -79,11 +79,12 @@ Mesh* planet;
 Mesh* spaceShip;
 Mesh* spaceShip2;
 Mesh* spaceShip3;
+Mesh* spaceShip4;
 CubeMesh* obj1;
 CubeMesh* obj2;
 CubeMesh* obj3;
 CubeMesh* obj4;
-static CubeMesh cube2 = CubeMesh(1, Vec3(-5, -5, -10));
+static CubeMesh cube2 = CubeMesh(1, Vec3(-5, -5, 10));
 static CubeMesh cube3 = CubeMesh(1, Vec3(-5, 5, -20));  
 static CubeMesh cube4 = CubeMesh(1, Vec3(5, 5, -30));
 
@@ -114,18 +115,21 @@ void Init()
     textHelloWorld->position = Vec3(0, 0, -490);
     textHelloWorld->color = &RGB::green;
     
-    */
     
     spaceShip = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
     spaceShip->position = Direction::left * 30 + Direction::forward * 10;
 
-/*
     spaceShip2 = LoadMeshFromOBJFile("SpaceShip_3.obj");
     spaceShip2->position = Direction::right * 40 + Direction::forward * 100;
     spaceShip2->rotation = Matrix3x3::RotY(PI);
 
     spaceShip3 = LoadMeshFromOBJFile("SpaceShip_5.obj");
     spaceShip3->position = Direction::right * 20 + Direction::up * 10;
+    */
+
+  spaceShip4 = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
+  spaceShip4->position = Direction::forward * 10;
+/*
  
     Mesh* parent = new CubeMesh();
     Mesh* child = new CubeMesh();
@@ -162,6 +166,10 @@ void Init()
 void Update()
 {
    float rotationSpeed = (PI / 2) * deltaTime;
+   if (spaceShip4)
+   {
+    spaceShip4->rotation = Matrix3x3::RotY(-(PI / 10) * deltaTime) * spaceShip4->rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+   }
     cube2.rotation = Matrix3x3::RotX(rotationSpeed) * cube2.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
     cube3.rotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
     cube4.rotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
@@ -174,8 +182,14 @@ void Core0(void * param)
 {
   for(;;) 
   {
+    Time();
     Input();
-    //Debug();
+    Physics();
+    Update();
+    /*display.fillSprite(TFT_BLACK);
+    Draw();//Debug();
+    display.drawString(String(fps),20,20,4);
+    lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());*/
   }
 }
 
@@ -183,13 +197,11 @@ void Core1(void * param)
 {
   for(;;) 
   {
-    Time();
-    //Input();
-    Physics();
-    Update();
+    Time2();
     display.fillSprite(TFT_BLACK);
-    Draw();//Debug();
-    display.drawString(String(fps),20,20,4);
+    Draw();
+    display.drawString(String("Core 0 [")+fps+" fps]", 20,20,4);
+    display.drawString(String("Core 1 [")+fps2+" fps]", 20,50,4);
     lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
   }
 }
@@ -197,13 +209,12 @@ void Core1(void * param)
 void setup() 
 {
   Serial.begin(BAUD_RATE);
-/*
+
   if (!SPIFFS.begin(true))
   {
-    Serial.println("Failed while mounting SPIFFS.");0
-    return;
+    Serial.println("Failed while mounting SPIFFS.");
   }
-  */
+  
   Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
   //ptrPot1 = &sendDelay;
@@ -234,7 +245,7 @@ void setup()
     "Core 0 Task", // name of task
     10000, // stack size in words
     NULL, // task params
-    1, //Priority
+    17, //Priority
     &Core0Task, // TaskHandle_t
     0 // core
   );

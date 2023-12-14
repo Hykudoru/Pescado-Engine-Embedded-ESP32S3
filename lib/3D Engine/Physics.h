@@ -13,7 +13,7 @@ Vec3 gravity = Vec3(0, -9.81, 0);
 const float defaultAcceleration = 50;
 float accel = defaultAcceleration;
 float decel = -5;
-float rotateSpeed = PI/4;//PI / 2;
+float rotateSpeed = PI/2;//PI / 2;
 bool isKinematic = false;
 bool dampenersActive = true;
 Vec3 moveDir = Vec3(0, 0, 0);
@@ -57,6 +57,38 @@ void Time()
     t += deltaTime;
     frames++;
     fps = ((float)frames) / t;
+    if (t >= 1.0)
+    {
+        t = 0;
+        frames = 0;
+    }
+}
+
+unsigned long deltaTimeMillis2 = 0.0;//time difference (in milliseconds) between each loop;
+unsigned long deltaTimeMicros2 = 0.0;//time difference (in microseconds) between each loop
+float deltaTime2 = 0;
+int fps2 = 0;
+
+void Time2()
+{
+    
+  static unsigned long prevMillisTime = millis();
+  static unsigned long prevMicrosTime = micros();
+
+  deltaTimeMillis2 = (millis() - prevMillisTime);
+  prevMillisTime = millis();
+
+  deltaTimeMicros2 = (micros() - prevMicrosTime);
+  prevMicrosTime = micros();
+
+    deltaTime2 = deltaTimeMillis2*.001;
+
+    static float t = 0;
+    static int frames = 0;
+
+    t += deltaTime2;
+    frames++;
+    fps2 = ((float)frames) / t;
     if (t >= 1.0)
     {
         t = 0;
