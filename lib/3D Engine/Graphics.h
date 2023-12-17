@@ -1,6 +1,8 @@
 #pragma once
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
+#include <FS.h>
+#include <SPIFFS.h>
 #include <Matrix.h>
 #include <math.h>
 #include <vector>
@@ -36,11 +38,20 @@ int screenHeight = 240;//64;
 void ToScreenCoordinates(Vec3 &vec)
 {
     static Vec2 origin = Vec2(0.5*(float)screenWidth, 0.5*(float)screenHeight);
+    static float screenSpaceMatrix[4][4] = {
+        {0.5*screenWidth, 0, 0, origin.x},
+        {0,-0.5*screenHeight, 0, origin.y},
+        {0, 0, 1, 0},
+        {0,0,0,0}
+    };
+
+    vec = screenSpaceMatrix*vec;
+    /*
     static float screenXScalar = 0.5 * (float)screenWidth;
     static float screenYScalar = -0.5 * (float)screenHeight;
     vec.x *= screenXScalar;
     vec.y *= screenYScalar;
-    vec += origin;
+    vec += origin;*/
 }
 
 
@@ -874,13 +885,10 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
     static string filePath = "/";
 
     string mtlFileName = "";
-    File mtlFile;
 
     // ----------- Read object file -------------
     List<string> strings;
     string line;
-    //std::ifstream objFile;
-    //objFile.open(filePath+objFileName);
     File objFile = SPIFFS.open((filePath+objFileName).c_str(), "r");
     if (objFile)//if (objFile.is_open())
     {
@@ -898,6 +906,7 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
                 if (word == "mtllib") {
                     getline(ss, word, ' ');
                     mtlFileName = word;
+                    Serial.println(String(mtlFileName.c_str()));
                 }
                 else {
                     strings.emplace_back(word);
@@ -913,60 +922,60 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
     List<int>* indices = new List<int>();
     List<Triangle>* triangles = new List<Triangle>(indices->size() / 3);
     Material material;
-    material.color = Color(255, 255, 255);
-
     for (size_t i = 0; i < strings.size(); i++)
     {
         // v = vertex
         // f = face
         string objFileSubString = strings[i];
-        
         // if .obj encounters "usemtl" then the next string will be material id.
-       if (false) {/* if (objFileSubString == "usemtl")
-        {
-            // Try opening Material file to see if it exists
-            String mtlPathFile = String(filePath) + mtlFileName;
-            mtlFile = SPIFFS.open(mtlPathFile);
-            // check if using material before looking for material key words
-            if (mtlFile.available()) 
-            {
-                string mtlID = strings[++i];
-                bool mtlIDFound = false;
-                //materials->emplace_back(Material(materialID));
-                // search .mtl for material properties under the the current materialID
-                while (!mtlIDFound && mtlFile) 
-                {
-                    // 1st. Gets the next line.
-                    // 2nd. Seperates each word from that line then stores each word into the strings array.
-                    getline(mtlFile, line);
-                    string word;
-                    stringstream ss(line);
-                    while (!mtlIDFound && getline(ss, word, ' '))
-                    {    
-                        if (word == "newmtl")
-                        { 
-                            getline(ss, word, ' ');
-                            if (mtlID == word) {
-                                material.name = word;
-                            }
-                        }
-                        else if (mtlID == material.name && word == "Kd") {
-                            getline(ss, word, ' ');
-                            float r = stof(word);
-                            getline(ss, word, ' ');
-                            float g = stof(word);
-                            getline(ss, word, ' ');
-                            float b = stof(word);
-                            material.color = Color(255*r, 255*g, 255*b);
+        // if (objFileSubString == "usemtl")
+        // {
+        //     // Try opening Material file to see if it exists
+        //     File mtlFile = SPIFFS.open((filePath + mtlFileName).c_str());
+        //     // check if using material before looking for material key words
+        //     while (mtlFile) 
+        //     {
+        //         string mtlID = strings[++i];
+        //         bool mtlIDFound = false;
+        //         //materials->emplace_back(Material(materialID));
+        //         // search .mtl for material properties under the the current materialID
+        //         if (!mtlIDFound)// && mtlFile) 
+        //         {
+        //             // 1st. Gets the next line.
+        //             // 2nd. Seperates each word from that line then stores each word into the strings array.
+        //             String l = mtlFile.readStringUntil('\n');
+        //             line = l.c_str();
+        //             Serial.println(l);
+        //             Serial.println("!mtlIDFound");
+        //             string word;
+        //             stringstream ss(line);
+        //             while (!mtlIDFound && getline(ss, word, ' '))
+        //             {
+        //                 Serial.println("!mtlIDFound && getline(ss, word, ' ')");
+        //                 if (word == "newmtl")
+        //                 { 
+        //                     getline(ss, word, ' ');
+        //                     if (mtlID == word) {
+        //                         material.name = word;
+        //                     }
+        //                 }
+        //                 else if (mtlID == material.name && word == "Kd") {
+        //                     getline(ss, word, ' ');
+        //                     float r = stof(word);
+        //                     getline(ss, word, ' ');
+        //                     float g = stof(word);
+        //                     getline(ss, word, ' ');
+        //                     float b = stof(word);
+        //                     material.color = Color(255*r, 255*g, 255*b);
 
-                            mtlIDFound = true;
-                        }
-                    }
-                }
-                mtlFile.close();
-            }*/
-        }
-
+        //                     mtlIDFound = true;
+        //                 }
+        //             }
+        //         }
+        //         mtlFile.close();
+        //     }
+        // }
+        if (false){}
         else if (objFileSubString == "v") {
             float x = stof(strings[++i]);
             float y = stof(strings[++i]);
