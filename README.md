@@ -1,4 +1,4 @@
-A 3D graphics engine for the ESP32. Board/Display: LILYGO T-Display-S3 ESP32-S3. 
+A 3D Graphics Engine for the ESP32. Board/Display: LILYGO T-Display-S3 ESP32-S3. 
 
 -----Instructions/Gotchas-----
 1. Make sure to select "Upload Filesystem Image" from the PlatformIO extension in VS Code. This will upload all the data/*.obj files to your ESP32 board. 
