@@ -422,7 +422,7 @@ class Transform
 public:
     Vec3 scale = Vec3(1, 1, 1);
     Vec3 position = Vec3(0, 0, 0);
-    Matrix3x3 rotation = Identity3x3;
+    Matrix3x3 rotation = Matrix3x3::identity;
     Transform* root = nullptr;
     Transform* parent = nullptr;
     static bool parentHierarchyDefault;

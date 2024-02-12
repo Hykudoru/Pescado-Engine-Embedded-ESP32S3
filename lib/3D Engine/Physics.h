@@ -154,7 +154,7 @@ public:
     Vec3 velocity = Vec3::zero;
     Vec3 angularVelocity = Vec3::zero;
     Vec3 position = Vec3::zero;
-    Matrix3x3 rotation = Identity3x3;
+    Matrix3x3 rotation = Matrix3x3::identity;
 
     //Collider collider;
 };

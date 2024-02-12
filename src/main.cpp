@@ -16,8 +16,10 @@
 #include <string>
 #include <math.h>
 
+#include <esp_now.h>
+#include <WiFi.h>
+#include <WirelessData.h>
 //Alex Lib
-#include <Functions.h>
 #include <Vector.h>
 #include <MuxJoystick.h>
 #include <3D Engine.h>
@@ -42,12 +44,10 @@ pointerFunction ptrMode;
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite display = TFT_eSprite(&tft);
-
-const int LEFT_JOYSTICK_MUX_PORT = 0;
-const int RIGHT_JOYSTICK_MUX_PORT = 3;
-MuxJoystick leftJoystick(LEFT_JOYSTICK_MUX_PORT, false, false);
-MuxJoystick rightJoystick(RIGHT_JOYSTICK_MUX_PORT, false, false);
-
+Adafruit_SSD1306 oled = Adafruit_SSD1306(128, 32, &Wire);
+extern MuxJoystick leftJoystick;
+extern MuxJoystick rightJoystick;
+extern unsigned int incomingCount;
 
 // Checking if DEBUGGING true in other scripts before using cout also ensures readable slow incremental output.
 bool DEBUGGING = false;
@@ -199,9 +199,15 @@ void Core1(void * param)
     Draw();
     display.drawString(String("Core 0 [")+fps+" fps]", 20,20,4);
     display.drawString(String("Core 1 [")+fps2+" fps]", 20,50,4);
+    display.drawString(String("Packets Incoming: ")+incomingCount, 20,110,4);
+    display.drawString(String("X:")+incomingData.leftJoystick[0]+ String(" Y:")+incomingData.leftJoystick[1], 20,170,4);
+    display.drawString(String("X:")+incomingData.rightJoystick[0] + String(" Y:")+incomingData.rightJoystick[1], 20,200,4);
     lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
   }
 }
+
+extern IMU hmd;
+extern bool hmdAttached;
 
 void setup() 
 {
@@ -212,13 +218,20 @@ void setup()
     Serial.println("Failed while mounting SPIFFS.");
   }
   
-  Wire.begin(I2C_SDA, I2C_SCL);
   // ============ INPUT SETUP ===========
-  //ptrPot1 = &sendDelay;
-  
+
+  Wire.begin(I2C_SDA, I2C_SCL);
+  SetupESPNOW();
+
   leftJoystick.Start();
   rightJoystick.Start();
-
+  
+  if(hmd.Init())
+  {
+    hmdAttached = true;
+    //hmd.Calibrate();
+    //Camera::main->rotation = hmd.rotationMatrix;
+  }
   // INPUT_PULLUP button MUST be connected to GND
   // INPUT_PULLDOWN button MUST be connected to VCC
   //pinMode(BUTTON_A, INPUT_PULLUP);

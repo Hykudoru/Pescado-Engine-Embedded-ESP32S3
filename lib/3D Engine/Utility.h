@@ -2,9 +2,11 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 #include <Vector.h>
+#include <math.h>
+#include <vector>
 #define List std::vector
 extern bool DEBUGGING;
-
+#define PI 3.14159
 template <typename T>
 class ManagedObjectPool
 {
