@@ -162,13 +162,13 @@ static void CameraControl(Camera* cam)
     // }
     
     // Speed 
-    /*
-    if ((move.z == 1 || incomingData.LeftJoystick.z == 1) ^ (rotate.z || incomingData.RightJoystick.z == 1))
+    
+    if ((move.z == 1 || incomingData.leftJoystick[2] == 1) ^ (rotate.z || incomingData.rightJoystick[2] == 1))
     {
         accel = defaultAcceleration * 5;
     } else {
         accel = defaultAcceleration;
-    }*/
+    }
 }
 
 void OnClickButton1() 
