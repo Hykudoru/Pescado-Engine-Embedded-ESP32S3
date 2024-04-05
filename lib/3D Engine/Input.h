@@ -58,19 +58,19 @@ static void CameraControl(Camera* cam)
     float rate = rotateSpeed * deltaTime;
     // LOOK UP
     if (rotate.y > 0) {
-        cam->rotation *= Matrix3x3::RotX(rate);
+        cam->localRotation *= Matrix3x3::RotX(rate);
     }
     // LOOK DOWN
     if (rotate.y < 0) {
-        cam->rotation *= Matrix3x3::RotX(-rate);
+        cam->localRotation *= Matrix3x3::RotX(-rate);
     }
     // TURN LEFT
     if (rotate.x < 0) {
-        cam->rotation *= Matrix3x3::RotY(rate);
+        cam->localRotation *= Matrix3x3::RotY(rate);
     }
     // TURN RIGHT
     if (rotate.x > 0) {
-        cam->rotation *= Matrix3x3::RotY(-rate);
+        cam->localRotation *= Matrix3x3::RotY(-rate);
     }
     
     // Speed 
@@ -128,8 +128,8 @@ static void Input()
     {
     //Reset Camera
     case '0':
-        Camera::main->rotation = Identity3x3;
-        Camera::main->position = Vec3();
+        Camera::main->localRotation = Matrix3x3::identity;
+        Camera::main->localPosition = Vec3();
         break;
     //Switch Cameras
     case '1':
@@ -140,8 +140,8 @@ static void Input()
         break;
     case '3':  //Outsider perspective cam
         CameraSettings::outsiderViewPerspective = !CameraSettings::outsiderViewPerspective;
-        Camera::projector->rotation = Identity3x3;
-        Camera::projector->position = Vec3();
+        Camera::projector->localRotation = Matrix3x3::identity;
+        Camera::projector->localPosition = Vec3();
         break;
     //------------------Spawn-------------------
     case '9':  //Cube
@@ -155,8 +155,8 @@ static void Input()
                 Serial.println(e.what());
             }
             if (mesh != nullptr) {
-                mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
-                mesh->rotation = Camera::main->rotation;
+                mesh->localPosition = Camera::main->localPosition + (Camera::main->Forward() * 10);
+                mesh->localRotation = Camera::main->localRotation;
             }
 
        }
@@ -164,26 +164,26 @@ static void Input()
     case '8':  //Sphere
         {
             Mesh* mesh = LoadMeshFromOBJFile("Sphere.obj");
-            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
-            mesh->rotation = Camera::main->rotation;
+            mesh->localPosition = Camera::main->localPosition + (Camera::main->Forward() * 10);
+            mesh->localRotation = Camera::main->localRotation;
             break;
         }
     case '7':  //Diamond
         {
             Mesh* mesh = LoadMeshFromOBJFile("Diamond.obj");
-            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
-            mesh->rotation = Camera::main->rotation;
-            mesh->scale *= 0.1;
-            mesh->color = &RGB::red;
+            mesh->localPosition = Camera::main->localPosition + (Camera::main->Forward() * 10);
+            mesh->localRotation = Camera::main->localRotation;
+            mesh->localScale *= 0.1;
+            mesh->color = Color::red;
         }
       break;
     case '6':  //Icosahedron
         {
             Mesh* mesh = LoadMeshFromOBJFile("Icosahedron.obj");
-            mesh->position = Camera::main->position + (Camera::main->Forward() * 10);
-            mesh->rotation = Camera::main->rotation;
-            mesh->scale *= 0.1;
-            mesh->color = &RGB::purple;
+            mesh->localPosition = Camera::main->localPosition + (Camera::main->Forward() * 10);
+            mesh->localRotation = Camera::main->localRotation;
+            mesh->localScale *= 0.1;
+            mesh->color = Color::purple;
         }
       break;
     //------------------Physics-------------------
@@ -206,31 +206,31 @@ static void Input()
         break;
     //-------------------Debugging------------------------
     case 'i':
-        GraphicSettings::invertNormals = !GraphicSettings::invertNormals;  
+        Graphics::invertNormals = !Graphics::invertNormals;  
         break;
     case 'n':
-        GraphicSettings::debugNormals = !GraphicSettings::debugNormals;
+        Graphics::debugNormals = !Graphics::debugNormals;
         break;
     case 'v': 
-        GraphicSettings::backFaceCulling = !GraphicSettings::backFaceCulling;
+        Graphics::backFaceCulling = !Graphics::backFaceCulling;
         break;
     case 'f': 
-        GraphicSettings::fillTriangles = !GraphicSettings::fillTriangles;
+        Graphics::fillTriangles = !Graphics::fillTriangles;
         break;
     case 'm': 
-        GraphicSettings::displayWireFrames = !GraphicSettings::displayWireFrames;
+        Graphics::displayWireFrames = !Graphics::displayWireFrames;
         break;
     case ',': 
-        GraphicSettings::debugAxes = !GraphicSettings::debugAxes;
+        Graphics::debugAxes = !Graphics::debugAxes;
         break;
     case 'l': 
-        GraphicSettings::lighting = !GraphicSettings::lighting;
+        Graphics::lighting = !Graphics::lighting;
         break;
     case '4': 
-        GraphicSettings::vfx = !GraphicSettings::vfx;
+        Graphics::vfx = !Graphics::vfx;
         break;
     case '5': 
-        GraphicSettings::matrixMode = !GraphicSettings::matrixMode;
+        Graphics::matrixMode = !Graphics::matrixMode;
         break;
     default:
       break;

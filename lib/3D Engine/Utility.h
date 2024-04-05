@@ -2,8 +2,13 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 #include <Vector.h>
+#include <math.h>
+#include <vector>
 #define List std::vector
 extern bool DEBUGGING;
+//const float PI = 3.14159265359f;
+const float TAO = 2.0 * PI;
+typedef void (*Callback)();
 
 template <typename T>
 class ManagedObjectPool
@@ -14,22 +19,52 @@ public:
 
     ManagedObjectPool(T* obj)
     {
-        //objects.emplace(objects.begin() + count++, obj);
-        ManagedObjectPool::objects.emplace_back(obj);
-        count++;
-    }
-
-    ~ManagedObjectPool()
-    {
-        for (size_t i = 0; i < ManagedObjectPool::objects.size(); i++)
+        if (obj)
         {
-            if (this == ManagedObjectPool::objects[i]) {
-                ManagedObjectPool::objects.erase(ManagedObjectPool::objects.begin() + i);
+            ManagedObjectPool::objects.emplace_back(obj);
+            count = ManagedObjectPool::objects.size();//count++;
+        }
+    }
+    
+    virtual ~ManagedObjectPool()
+    {
+        for (size_t i = 0; i < ManagedObjectPool<T>::objects.size(); i++)
+        {
+            if (this == ManagedObjectPool<T>::objects[i]) {
+                ManagedObjectPool<T>::objects.erase(ManagedObjectPool<T>::objects.begin() + i);
+                count = ManagedObjectPool<T>::objects.size();
                 break;
             }
         }
-        count--;
     }
+protected:
+    static void addToPool(T* obj)
+    {
+        for (size_t i = 0; i < ManagedObjectPool<T>::objects.size(); i++)
+        {
+            if (obj == ManagedObjectPool<T>::objects[i]) {
+                return;
+            }
+        }
+        
+        ManagedObjectPool<T>::objects.emplace_back(obj);
+        count = ManagedObjectPool<T>::objects.size();//count++;
+    }
+
+    static void removeFromPool(T* obj)
+    {
+        for (size_t i = 0; i < ManagedObjectPool<T>::objects.size(); i++)
+        {
+            if (obj == ManagedObjectPool<T>::objects[i]) {
+                ManagedObjectPool<T>::objects.erase(ManagedObjectPool<T>::objects.begin() + i);
+                count = ManagedObjectPool<T>::objects.size();
+                return;
+            }
+        }
+    }
+    
+
+   
 };
 template <typename T>
 List<T*> ManagedObjectPool<T>::objects = List<T*>();
@@ -52,16 +87,47 @@ struct Plane
         Normal();
     }
 
+    //NEEDS TESTING
     Plane(Vec3 pointOnPlane, Vec3 normal)
     {
         this->normal = normal;
+        verts[0] = pointOnPlane;
         float D = DotProduct(normal, pointOnPlane);
-        float xIntercept = D / normal.x;
-        float yIntercept = D / normal.y;
-        float zIntercept = D / normal.z;
-        verts[0] = Vec3(xIntercept, 0, 0);
-        verts[1] = Vec3(0, yIntercept, 0);
-        verts[2] = Vec3(0, 0, zIntercept);
+        float x = pointOnPlane.x;
+        float y = pointOnPlane.y;
+        float z = pointOnPlane.z;
+        
+        if (normal.x == 0.0 && normal.y == 0.0 && normal.z == 1.0)
+        {
+            verts[1] = pointOnPlane + Vec3(1, 1, 0);
+            verts[2] = pointOnPlane + Vec3(-1, 1, 0);
+            return;
+        }
+        else if (normal.x == 0.0 && normal.y == 1.0 && normal.z == 0.0)
+        {
+            verts[1] = pointOnPlane + Vec3(1, 0, 1);
+            verts[2] = pointOnPlane + Vec3(-1, 0, 1);
+            return;
+        }
+        else if (normal.x == 1.0 && normal.y == 0.0 && normal.z == 0.0)
+        {
+            verts[1] = pointOnPlane + Vec3(0, 1, 1);
+            verts[2] = pointOnPlane + Vec3(0, -1, 1);
+            return;
+        }
+
+        if (normal.x != 0.0) {
+            x = D / normal.x;
+            verts[0] = Vec3(x, 0, 0);
+        }
+        if (normal.y != 0.0) {
+            y = D / normal.y;
+            verts[0] = Vec3(0, y, 0);
+        }
+        if (normal.x != 0.0) {
+            z = D / normal.z;
+            verts[0] = Vec3(0, 0, z);
+        }
     }
 
     Vec3 Normal()
@@ -98,6 +164,21 @@ float Clamp(float value, float min, float max)
     return value;
 }
 
+Vec3 RandomVector()
+{
+    Vec3 randomVector = Vec3(rand(), rand(), rand());
+
+    return randomVector;
+}
+
+Vec3 RandomDirection()
+{
+    Vec3 vec = RandomVector();
+    vec.Normalize();
+
+    return vec;
+}
+
 float ToDeg(float rad) {
     return rad * 180.0 / PI;
 }
@@ -117,19 +198,15 @@ Vec3 ProjectOnPlane(Vec3 v, Vec3 n)
     return v - b;
 }
 
-Range ProjectVertsOntoAxis(const Vec3 verts[], const int& count, Vec3& axis)
+Range ProjectVertsOntoAxis(Vec3* verts, const int& count, Vec3& axis)
 {
-    float min = 0;
-    float max = 0;
-    for (size_t k = 0; k < count; k++)
+    float dist = DotProduct(verts[0], axis);
+    float min = dist;
+    float max = dist;
+    for (size_t k = 1; k < count; k++)
     {
-        float dist = DotProduct(verts[k], axis);
-        if (k == 0)
-        {
-            min = dist;
-            max = dist;
-        }
-        else if (dist < min) {
+        dist = DotProduct(verts[k], axis);
+        if (dist < min) {
             min = dist;
         }
         else if (dist > max) {
@@ -180,26 +257,32 @@ bool LinePlaneIntersecting(Vec3& lineStart, Vec3& lineEnd, Plane& plane, Vec3* p
     Vec3 n = plane.Normal();
     Vec3 pointPlane = plane.verts[0];
     Vec3 v = lineEnd - lineStart;
-
-    float t = DotProduct(n, pointPlane - lineStart) / DotProduct(n, v);
-    Vec3 pIntersect = lineStart + (v * t);
-
-    if (DotProduct(pIntersect - lineStart, v) > 0.0)
+    float divisor = DotProduct(n, v);
+    if (divisor != 0.0) 
     {
-        *pointIntersecting = pIntersect;
-        return true;
+        float t = DotProduct(n, pointPlane - lineStart) / divisor;    
+        //if (t >= 0.0)
+        {
+            *pointIntersecting = lineStart + (v*t);
+            return true;
+        }
     }
-
     return false;
-}
+} 
 
 bool PointInsideTriangle(const Vec3& p, const Vec3 triPoints[3])
 {
     Vec3 A = triPoints[0];
     Vec3 B = triPoints[1];
     Vec3 C = triPoints[2];
-    float w1 = (((p.x - A.x) * (C.y - A.y)) - ((p.y - A.y) * (C.x - A.x))) / (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x)));
-    float w2 = ((p.y - A.y) - (w1 * (B.y - A.y))) / (C.y - A.y);
+    float divisor = (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x)));
+    float divisor2 = (C.y - A.y);
+    if (divisor == 0.0 || divisor2 == 0.0)
+    {
+        return false;
+    }
+    float w1 = (((p.x - A.x) * (C.y - A.y)) - ((p.y - A.y) * (C.x - A.x))) / divisor;
+    float w2 = ((p.y - A.y) - (w1 * (B.y - A.y))) / divisor2;
 
     return ((w1 >= 0.0 && w2 >= 0.0) && (w1 + w2) <= 1.0);
 }
@@ -215,5 +298,11 @@ void PlanesIntersecting(Vec3& normal1, Vec3& p1, Vec3& normal2, Vec3& p2)
 
     float t = 0;
     Vec3 line = Vec3(x, y, 0) + v * t;
+}
+
+Vec3 ClosestPointOnSphere(Vec3 center, float radius, Vec3 somePoint)
+{
+    Vec3 dir = (somePoint - center).Normalized();
+    return center + dir * radius;
 }
 #endif

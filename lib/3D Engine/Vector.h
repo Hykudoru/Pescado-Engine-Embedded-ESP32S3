@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include <math.h>
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -89,25 +90,24 @@ public:
 
     Vector2 operator+(const Vector2& other)
     {
-        Vector2 vectorSum;
-        vectorSum.x = this->x + other.x;
-        vectorSum.y = this->y + other.y;
+        Vector2 vectorSum(this->x + other.x, this->y + other.y);
         return vectorSum;
     }
 
     Vector2 operator-(const Vector2& other)
     {
-        Vector2 vectorDiff;
-        vectorDiff.x = this->x - other.x;
-        vectorDiff.y = this->y - other.y;
+        Vector2 vectorDiff(this->x - other.x, this->y - other.y);
         return vectorDiff;
+    }
+    Vector2 operator-()//allows for -vec syntax
+    {
+        Vector2 vectorNeg(-this->x, -this->y);
+        return vectorNeg;
     }
 
     Vector2 operator*(const T& scalar)
     {
-        Vector2 scaledVector;
-        scaledVector.x = this->x * scalar;
-        scaledVector.y = this->y * scalar;
+        Vector2 scaledVector(this->x * scalar, this->y * scalar);
         return scaledVector;
     }
 
@@ -140,6 +140,10 @@ public:
         }
         return *this;
     }
+
+
+    friend bool operator==(const Vector2& vecA, const Vector2& vecB) { return (vecA.x == vecB.x && vecA.y == vecB.y); }
+    friend bool operator!=(const Vector2& vecA, const Vector2& vecB) { return (vecA.x != vecB.x || vecA.y != vecB.y); }
 
     operator Vector3<T>();
 };
@@ -178,6 +182,7 @@ public:
     T z;
     int size = 3;
     static Vector3<T> zero;
+    static Vector3<T> one;
 
     Vector3();
     Vector3(T xVal, T yVal, T zVal);
@@ -232,28 +237,24 @@ public:
 
     Vector3 operator+(const Vector3& other)
     {
-        Vector3 vectorSum;
-        vectorSum.x = this->x + other.x;
-        vectorSum.y = this->y + other.y;
-        vectorSum.z = this->z + other.z;
+        Vector3 vectorSum(this->x + other.x, this->y + other.y, this->z + other.z);
         return vectorSum;
     }
 
     Vector3 operator-(const Vector3& other)
     {
-        Vector3 vectorDiff;
-        vectorDiff.x = this->x - other.x;
-        vectorDiff.y = this->y - other.y;
-        vectorDiff.z = this->z - other.z;
+        Vector3 vectorDiff(this->x - other.x, this->y - other.y, this->z - other.z);
         return vectorDiff;
+    }
+    Vector3 operator-()//allows for -vec syntax
+    {
+        Vector3 vectorNeg(-this->x, -this->y, -this->z);
+        return vectorNeg;
     }
 
     Vector3 operator*(const T& scalar)
     {
-        Vector3 scaledVector;
-        scaledVector.x = this->x * scalar;
-        scaledVector.y = this->y * scalar;
-        scaledVector.z = this->z * scalar;
+        Vector3 scaledVector(this->x * scalar, this->y * scalar, this->z * scalar);
         return scaledVector;
     }
 
@@ -292,11 +293,16 @@ public:
         }
     }
 
+    friend bool operator==(const Vector3& vecA, const Vector3& vecB) { return (vecA.x == vecB.x && vecA.y == vecB.y && vecA.z == vecB.z); }
+    friend bool operator!=(const Vector3& vecA, const Vector3& vecB) { return (vecA.x != vecB.x || vecA.y != vecB.y || vecA.z == vecB.z); }
+
     operator Vector2<T>();
     operator Vector4<T>();
 };
 template <typename T>
 Vector3<T> Vector3<T>::zero = { 0, 0, 0 };
+template <typename T>
+Vector3<T> Vector3<T>::one = { 1, 1, 1 };
 
 // Constructors
 template <typename T>
@@ -413,4 +419,43 @@ Vector4<T>::operator Vector2<T>()
 #define Vec3 Vector3<float>
 #define Vec4 Vector4<float>
 #define Euler Vec3;
+
+
+template <typename T>//Syntax: scalar * vector
+Vector2<T> operator*(const float& scalar, const Vector2<T>& vector)
+{
+    Vector2<T> scaledVector = vector;
+    scaledVector.x = scaledVector.x * scalar;
+    scaledVector.y = scaledVector.y * scalar;
+    return scaledVector;
+}
+
+template <typename T> //Syntax: vector * scalar
+Vector2<T> operator*(const Vector2<T>& vector, const float& scalar)
+{
+    Vector2<T> scaledVector = vector;
+    scaledVector.x = scaledVector.x * scalar;
+    scaledVector.y = scaledVector.y * scalar;
+    return scaledVector;
+}
+
+template <typename T> //Syntax: scalar * vector
+Vector3<T> operator*(const float& scalar, const Vector3<T>& vector)
+{
+    Vector3<T> scaledVector = vector;
+    scaledVector.x = scaledVector.x * scalar;
+    scaledVector.y = scaledVector.y * scalar;
+    scaledVector.z = scaledVector.z * scalar;
+    return scaledVector;
+}
+
+template <typename T> //Syntax: vector * scalar
+Vector3<T> operator*(const Vector3<T>& vector, const float& scalar)
+{
+    Vector3<T> scaledVector = vector;
+    scaledVector.x = scaledVector.x * scalar;
+    scaledVector.y = scaledVector.y * scalar;
+    scaledVector.z = scaledVector.z * scalar;
+    return scaledVector;
+}
 #endif

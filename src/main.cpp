@@ -90,16 +90,16 @@ static CubeMesh cube4 = CubeMesh(1, Vec3(5, 5, -30));
 
 void Init()
 {
-  GraphicSettings::matrixMode = true;
-  GraphicSettings::lighting = false;
-  GraphicSettings::displayWireFrames = true;
-  GraphicSettings::fillTriangles = false;
-  GraphicSettings::debugAxes = true;
+  Graphics::matrixMode = true;
+  Graphics::lighting = false;
+  Graphics::displayWireFrames = true;
+  Graphics::fillTriangles = false;
+  Graphics::debugAxes = true;
   Physics::collisionDetection = false;
   FOV(60);
-  cube2.color = &RGB::green;
-  cube3.color = &RGB::red;
-  cube4.color = &RGB::yellow;
+  cube2.color = Color::green;
+  cube3.color = Color::red;
+  cube4.color = Color::yellow;
   //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
   //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
    // CubeMesh* cube = new CubeMesh(1, Vec3());
@@ -129,7 +129,7 @@ void Init()
     */
 
   spaceShip4 = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
-  spaceShip4->position = Direction::forward * 10;
+  spaceShip4->localPosition = Direction::forward * 10;
 /*
  
     Mesh* parent = new CubeMesh();
@@ -169,11 +169,11 @@ void Update()
    float rotationSpeed = (PI / 2) * deltaTime;
    if (spaceShip4)
    {
-    spaceShip4->rotation = Matrix3x3::RotY(-(PI / 10) * deltaTime) * spaceShip4->rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    spaceShip4->localRotation = Matrix3x3::RotY(-(PI / 10) * deltaTime) * spaceShip4->localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
    }
-    cube2.rotation = Matrix3x3::RotX(rotationSpeed) * cube2.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-    cube3.rotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-    cube4.rotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.rotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube2.localRotation = Matrix3x3::RotX(rotationSpeed) * cube2.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube3.localRotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube4.localRotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
 }
 
 TaskHandle_t Core0Task;
