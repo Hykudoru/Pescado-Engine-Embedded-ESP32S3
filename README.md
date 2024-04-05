@@ -1,5 +1,6 @@
 A 3D Graphics Engine for the ESP32.
 
+Version 2.0
 <h2>Hardware</h2>
 
 - Board/Display: LILYGO T-Display-S3 ESP32-S3 --> https://www.amazon.com/dp/B0C2T6DP5J?ref=ppx_yo2ov_dt_b_product_details&th=1
@@ -17,3 +18,5 @@ A 3D Graphics Engine for the ESP32.
      Serial.println("Failed while mounting SPIFFS.");
      return;
     }</code>
+
+<b>Note:</b> When the program starts, if you still see a black screen after ~15 seconds you may need to try a few things. Option 1: Restart the device. Option 2: Disconnect it from your computer and use some other power source. Option 3: Open the serial monitor in VS code. Option 4: Pray. 
