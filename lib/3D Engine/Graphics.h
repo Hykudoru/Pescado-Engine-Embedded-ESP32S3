@@ -12,7 +12,6 @@
 #include <fstream>
 #include <sstream>
 #include <Utility.h>
-#include <U8g2lib.h>
 
 using namespace std;
 
@@ -263,27 +262,27 @@ public:
 
     void SetParent(Transform* newParent, bool changeOfBasisTransition = true);
 
-    Matrix4x4 LocalScale4x4();
+    IRAM_ATTR Matrix4x4 LocalScale4x4();
 
-    Matrix4x4 LocalScale4x4Inverse();
+    IRAM_ATTR Matrix4x4 LocalScale4x4Inverse();
 
-    Matrix4x4 LocalRotation4x4();
+    IRAM_ATTR Matrix4x4 LocalRotation4x4();
 
-    Matrix4x4 LocalTranslation4x4();
+    IRAM_ATTR Matrix4x4 LocalTranslation4x4();
 
-    Matrix4x4 LocalTranslation4x4Inverse();
+    IRAM_ATTR Matrix4x4 LocalTranslation4x4Inverse();
 
     // 1:Scale, 2:Rotate, 3:Translate
-    Matrix4x4 TRS();
+    IRAM_ATTR Matrix4x4 TRS();
 
     // S^-1 * R^-1 * T^-1
-    Matrix4x4 TRSInverse();
+    IRAM_ATTR Matrix4x4 TRSInverse();
 
     // 1:Rotate, 2:Translate
-    Matrix4x4 TR();
+    IRAM_ATTR Matrix4x4 TR();
 
     // R^-1 * T^-1
-    Matrix4x4 TRInverse();
+    IRAM_ATTR Matrix4x4 TRInverse();
 };
 
 class Mesh : public Transform, public ManagedObjectPool<Mesh>
@@ -327,7 +326,7 @@ public:
 
     void SetColor(Color& c);
 
-    virtual List<Triangle>* MapVertsToTriangles();
+    virtual IRAM_ATTR List<Triangle>* MapVertsToTriangles();
 
     //Convert to world coordinates
     List<Vec3> WorldVertices();
@@ -345,11 +344,11 @@ int screenHeight = 240;//64;
 
 void ToScreenCoordinates(Vec3 &vec)
 {
-    static Vec2 origin = Vec2(0.5*(float)screenWidth, 0.5*(float)screenHeight);
+    static Vec2 origin = Vec2(0.5f*(float)screenWidth, 0.5f*(float)screenHeight);
     static float screenSpaceMatrix[4][4] = {
-        {0.5*screenWidth, 0, 0, origin.x},
-        {0,-0.5*screenHeight, 0, origin.y},
-        {0, 0, 1, 0},
+        {0.5f*screenWidth, 0, 0, origin.x},
+        {0,-0.5f*screenHeight, 0, origin.y},
+        {0, 0, 1.0f, 0},
         {0,0,0,0}
     };
 
@@ -483,9 +482,9 @@ bool Graphics::vfx = false;
 bool Graphics::matrixMode = false;
 long Graphics::hexColor = 0xFFFFFF;
 
-Vec3 lightSource = .25*Direction::up  + Direction::back * .5;
-float nearClippingPlane = -0.1;
-float farClippingPlane = -100000.0;
+Vec3 lightSource = .25f*Direction::up  + Direction::back * .5f;
+float nearClippingPlane = -0.1f;
+float farClippingPlane = -100000.0f;
 float fieldOfViewDeg = 60;
 float fov = ToRad(fieldOfViewDeg);
 float aspect = (float)screenHeight / (float)screenWidth;
@@ -645,9 +644,9 @@ struct Triangle : Plane
     Vec4 Centroid()
     {
         centroid = Vec4(
-            (verts[0].x + verts[1].x + verts[2].x) / 3.0,
-            (verts[0].y + verts[1].y + verts[2].y) / 3.0,
-            (verts[0].z + verts[1].z + verts[2].z) / 3.0,
+            (verts[0].x + verts[1].x + verts[2].x) / 3.0f,
+            (verts[0].y + verts[1].y + verts[2].y) / 3.0f,
+            (verts[0].z + verts[1].z + verts[2].z) / 3.0f,
             centroid.w
         );
 
@@ -682,7 +681,7 @@ struct Triangle : Plane
         {
             if (Graphics::fillTriangles)
             {
-                float c = Clamp(1.0 / (0.000001 + (color.r + color.g + color.b) / 3), 0, 255);
+                float c = Clamp(1.0 / (0.000001f + (color.r + color.g + color.b) / 3), 0, 255);
                 Graphics::SetDrawColor(c, c, c);
             }
             Graphics::DrawLine(p1, p2);
@@ -827,7 +826,7 @@ void Transform::SetParent(Transform* newParent, bool changeOfBasisTransition)
     }
 }
 
-Matrix4x4 Transform::LocalScale4x4()
+IRAM_ATTR Matrix4x4 Transform::LocalScale4x4()
 {
     float matrix[4][4] =
     {
@@ -840,20 +839,20 @@ Matrix4x4 Transform::LocalScale4x4()
     return Matrix4x4(matrix);
 }
 
-Matrix4x4 Transform::LocalScale4x4Inverse()
+IRAM_ATTR Matrix4x4 Transform::LocalScale4x4Inverse()
 {
     float inverse[4][4] =
     {
-        {1.0 / this->localScale.x, 0, 0, 0},
-        {0, 1.0 / this->localScale.y, 0, 0},
-        {0, 0, 1.0 / this->localScale.z, 0},
+        {1.0f / this->localScale.x, 0, 0, 0},
+        {0, 1.0f / this->localScale.y, 0, 0},
+        {0, 0, 1.0f / this->localScale.z, 0},
         {0, 0, 0, 1}
     };
 
     return Matrix4x4(inverse);
 }
 
-Matrix4x4 Transform::LocalRotation4x4()
+IRAM_ATTR Matrix4x4 Transform::LocalRotation4x4()
 {
     float matrix[4][4] =
     {
@@ -866,7 +865,7 @@ Matrix4x4 Transform::LocalRotation4x4()
     return Matrix4x4(matrix);
 }
 
-Matrix4x4 Transform::LocalTranslation4x4()
+IRAM_ATTR Matrix4x4 Transform::LocalTranslation4x4()
 {
     float matrix[4][4] =
     {
@@ -879,7 +878,7 @@ Matrix4x4 Transform::LocalTranslation4x4()
     return Matrix4x4(matrix);
 }
 
-Matrix4x4 Transform::LocalTranslation4x4Inverse()
+IRAM_ATTR Matrix4x4 Transform::LocalTranslation4x4Inverse()
 {
     float matrix[4][4] =
     {
@@ -893,7 +892,7 @@ Matrix4x4 Transform::LocalTranslation4x4Inverse()
 }
 
 // 1:Scale, 2:Rotate, 3:Translate
-Matrix4x4 Transform::TRS()
+IRAM_ATTR Matrix4x4 Transform::TRS()
 {
     float trs[4][4] =
     {
@@ -911,7 +910,7 @@ Matrix4x4 Transform::TRS()
 }
 
 // S^-1 * R^-1 * T^-1
-Matrix4x4 Transform::TRSInverse()
+IRAM_ATTR Matrix4x4 Transform::TRSInverse()
 {
     if (parent) {
         return LocalScale4x4Inverse() * Matrix4x4::Transpose(LocalRotation4x4()) * LocalTranslation4x4Inverse() * parent->TRSInverse();
@@ -921,7 +920,7 @@ Matrix4x4 Transform::TRSInverse()
 }
 
 // 1:Rotate, 2:Translate
-Matrix4x4 Transform::TR()
+IRAM_ATTR Matrix4x4 Transform::TR()
 {
     float tr[4][4] =
     {
@@ -938,7 +937,7 @@ Matrix4x4 Transform::TR()
 }
 
 // R^-1 * T^-1
-Matrix4x4 Transform::TRInverse()
+IRAM_ATTR Matrix4x4 Transform::TRInverse()
 {
     if (parent) {
         return  Matrix4x4::Transpose(LocalRotation4x4()) * LocalTranslation4x4Inverse() * parent->TRInverse();
@@ -1008,7 +1007,7 @@ void Mesh::SetColor(Color& c)
     }
 }
 
-List<Triangle>* Mesh::MapVertsToTriangles()
+IRAM_ATTR List<Triangle>* Mesh::MapVertsToTriangles()
 {
     if (vertices && indices)
     {
@@ -1043,7 +1042,7 @@ List<Vec3> Mesh::WorldVertices()
     return verts;
 }
 
-void Mesh::TransformTriangles()
+IRAM_ATTR void Mesh::TransformTriangles()
 {
     // Scale/Distance ratio culling
     /* bool tooSmallToSee = scale.SqrMagnitude() / (position - Camera::main->position).SqrMagnitude() < 0.000000125;
@@ -1118,7 +1117,7 @@ void Mesh::TransformTriangles()
         camSpaceTri.Normal();//camSpaceTri.normal = worldToViewMatrix * modelToWorldMatrix * Vec4(camSpaceTri.normal, 0);
 
         if (Graphics::invertNormals) {
-            camSpaceTri.normal = ((Vec3)camSpaceTri.normal) * -1.0;
+            camSpaceTri.normal = ((Vec3)camSpaceTri.normal) * -1.0f;
         }
 
         // Back-face Culling - Checks if the triangles backside is facing the camera.
@@ -1139,7 +1138,7 @@ void Mesh::TransformTriangles()
             if (!ignoreLighting)
             {
                 float amountFacingLight = DotProduct((Vec3)worldSpaceTri.Normal(), lightSource);
-                Color colorLit = projectedTri.color * Clamp(amountFacingLight, 0.15, 1);
+                Color colorLit = projectedTri.color * Clamp(amountFacingLight, 0.15f, 1);
                 projectedTri.color = colorLit;
             }
         }
@@ -1199,15 +1198,15 @@ public:
         // Local Space (Object Space)
         this->vertices = new List<Vec3>({//new Vec3[8] {
             //south
-            Vec3(-0.5, -0.5, 0.5),
-            Vec3(-0.5, 0.5, 0.5),
-            Vec3(0.5, 0.5, 0.5),
-            Vec3(0.5, -0.5, 0.5),
+            Vec3(-0.5f, -0.5f, 0.5f),
+            Vec3(-0.5f, 0.5f, 0.5f),
+            Vec3(0.5f, 0.5f, 0.5f),
+            Vec3(0.5f, -0.5f, 0.5f),
             //north
-            Vec3(-0.5, -0.5, -0.5),
-            Vec3(-0.5, 0.5, -0.5),
-            Vec3(0.5, 0.5, -0.5),
-            Vec3(0.5, -0.5, -0.5)
+            Vec3(-0.5f, -0.5f, -0.5f),
+            Vec3(-0.5f, 0.5f, -0.5f),
+            Vec3(0.5f, 0.5f, -0.5f),
+            Vec3(0.5f, -0.5f, -0.5f)
             });
 
         this->indices = new List<int>{
@@ -1243,10 +1242,10 @@ public:
         :Mesh(scale, position, rotationEuler)
     {
         this->vertices = new List<Vec3>{
-                Vec3(-0.5, 0, 0.5),
-                Vec3(-0.5, 0, -0.5),
-                Vec3(0.5, 0, -0.5),
-                Vec3(0.5, 0, 0.5)
+                Vec3(-0.5f, 0, 0.5f),
+                Vec3(-0.5f, 0, -0.5f),
+                Vec3(0.5f, 0, -0.5f),
+                Vec3(0.5f, 0, 0.5f)
         };
 
         this->triangles->emplace_back(Triangle((*vertices)[0], (*vertices)[1], (*vertices)[2]));
@@ -1514,7 +1513,7 @@ Mesh* LoadMeshFromOBJFile(string objFileName)
 }
 */
 
-void Draw()
+IRAM_ATTR void Draw()
 {
     // Camera TRInverse = (TR)^-1 = R^-1*T^-1 = M = Mcw = World to Camera coords. 
     // This matrix isn't used on the camera itself, but we record the reverse transformations of the camera going from world space back to local camera space.
@@ -1528,22 +1527,22 @@ void Draw()
     for (int i = 0; i < Mesh::count; i++)
     {
         if (Graphics::frustumCulling)
-        {
+        {/*
             // Scale/Distance ratio culling
             float sqrDist = (Mesh::objects[i]->root->localPosition - Camera::main->Position()).SqrMagnitude();
-            if (sqrDist != 0.0)
+            if (sqrDist != 0.0f)
             {
                 bool meshTooSmallToSee = Mesh::objects[i]->root->localScale.SqrMagnitude() / sqrDist < 0.0000000000001;
                 if (meshTooSmallToSee) {
                     continue;
                 }
             }
-            /*
+            
             bool meshBehindCamera = DotProduct((Mesh::objects[i]->Position() - Camera::main->position), Camera::main->Forward()) <= 0.0;
             if (meshBehindCamera) {
                 continue;
             }
-*//*
+*/
             if (Mesh::objects[i]->vertices)
             {
                 List<Vec3> verts = *(Mesh::objects[i]->vertices);
@@ -1557,7 +1556,7 @@ void Draw()
                 {
                     continue;
                 }
-            }*/
+            }
 
             // ---------- Debug -----------
             if (Graphics::debugAxes)

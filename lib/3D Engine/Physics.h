@@ -9,7 +9,7 @@
 #include <Utility.h>
 using namespace std;
 
-Vec3 gravity = Vec3(0, -9.81, 0);
+Vec3 gravity = Vec3(0, -9.81f, 0);
 const float defaultAcceleration = 50;
 float accel = defaultAcceleration;
 float decel = -5;
@@ -53,7 +53,7 @@ void Time()
   deltaTimeMicros = (micros() - prevMicrosTime);
   prevMicrosTime = micros();
 
-    deltaTime = deltaTimeMillis*.001;
+    deltaTime = deltaTimeMillis*.001f;
 
     static float t = 0;
     static int frames = 0;
@@ -61,7 +61,7 @@ void Time()
     t += deltaTime;
     frames++;
     fps = ((float)frames) / t;
-    if (t >= 1.0)
+    if (t >= 1.0f)
     {
         t = 0;
         frames = 0;
@@ -85,7 +85,7 @@ void Time2()
   deltaTimeMicros2 = (micros() - prevMicrosTime);
   prevMicrosTime = micros();
 
-    deltaTime2 = deltaTimeMillis2*.001;
+    deltaTime2 = deltaTimeMillis2*.001f;
 
     static float t = 0;
     static int frames = 0;
@@ -93,7 +93,7 @@ void Time2()
     t += deltaTime2;
     frames++;
     fps2 = ((float)frames) / t;
-    if (t >= 1.0)
+    if (t >= 1.0f)
     {
         t = 0;
         frames = 0;
@@ -174,7 +174,7 @@ public:
     Mesh* mesh;
     bool isStatic = false;
     bool isTrigger = false;
-    float coefficientRestitution = 1.0;
+    float coefficientRestitution = 1.0f;
 
     Collider(bool isStatic = false, bool isTrigger = false): ManagedObjectPool<Collider>(this)
     {
@@ -323,7 +323,7 @@ void CalculateCollision(Vec3 lineOfImpact, float& m1, float& m2, Vec3& v1, Vec3&
     lineOfImpact.Normalize();
     Vec3 v1LineOfImpact = lineOfImpact * DotProduct(v1, lineOfImpact);
     Vec3 v2LineOfImpact = lineOfImpact * DotProduct(v2, lineOfImpact);
-    Vec3 v1LineOfImpactFinal = (v1LineOfImpact * m1 + v2LineOfImpact * m2 * 2.0 - v1LineOfImpact * m2) * (1.0 / (m1 + m2));
+    Vec3 v1LineOfImpactFinal = (v1LineOfImpact * m1 + v2LineOfImpact * m2 * 2.0f - v1LineOfImpact * m2) * (1.0f / (m1 + m2));
     Vec3 v2LineOfImpactFinal = ((v1LineOfImpact - v2LineOfImpact) * e) + v1LineOfImpactFinal;// e(v1-v2)+v1' = v2'
     Vec3 v1PerpendicularFinal = (v1 - v1LineOfImpact);//Perpendicular Velocity is the same before and after impact
     Vec3 v2PerpendicularFinal = (v2 - v2LineOfImpact);//Perpendicular Velocity is the same before and after impact
@@ -334,7 +334,7 @@ void CalculateCollision(Vec3 lineOfImpact, float& m1, float& m2, Vec3& v1, Vec3&
     v2 = v2Final;
 }
 
-void CalculateStaticCollision(Vec3 lineOfImpact, Vec3& v1, float e = 1.0)
+void CalculateStaticCollision(Vec3 lineOfImpact, Vec3& v1, float e = 1.0f)
 {
     Vec3 v1LineOfImpact = lineOfImpact * DotProduct(v1, lineOfImpact);
     Vec3 v1PerpendicularFinal = (v1 - v1LineOfImpact);//Perpendicular Velocity is the same before and after impact
@@ -358,7 +358,7 @@ bool SpherePlaneColliding(SphereCollider& sphere, PlaneCollider& plane, SphereCo
             Vec3 pointOnSphere = ClosestPointOnSphere(sphereCenter, radius, closestPointOnPlane);
             Vec3 offset = pointOnSphere - closestPointOnPlane;//overlapping
             sphere.root->localPosition -= offset;
-            collisionInfo.lineOfImpact = normal * -1.0;
+            collisionInfo.lineOfImpact = normal * -1.0f;
         }
     }
 
@@ -389,10 +389,10 @@ bool SpheresColliding(SphereCollider& sphere1, SphereCollider& sphere2, SphereCo
         Vec3 offset = (pointOnSphere1 - pointOnSphere2);
         collisionInfo.lineOfImpact = offset;
         if (resolve) {
-            offset *= 0.5;
+            offset *= 0.5f;
             sphere1.root->localPosition -= offset;
             sphere2.root->localPosition += offset;
-            collisionInfo.pointOfContact = (pointOnSphere1 + pointOnSphere2) * 0.5;
+            collisionInfo.pointOfContact = (pointOnSphere1 + pointOnSphere2) * 0.5f;
         }
     }
 
@@ -477,7 +477,7 @@ bool OBBSATColliding(BoxCollider& box1, BoxCollider& box2, BoxCollisionInfo& col
 
                 //Make sure normals are not the same before using them to calculate the cross product (otherwise the axis would be <0, 0, 0>).
                 float dot = DotProduct(nA, nB);
-                bool sameAxis = dot >= 1.0 || dot <= -1.0;
+                bool sameAxis = dot >= 1.0 || dot <= -1.0f;
                 if (sameAxis)
                 {
                     if ((j + 1) >= physObj2Normals.size()) {
@@ -526,9 +526,9 @@ bool OBBSATColliding(BoxCollider& box1, BoxCollider& box2, BoxCollisionInfo& col
         bool neitherStatic = !box1.isStatic && !box2.isStatic;
         if (neitherStatic)
         {
-            offset *= 0.5;
-            box1.root->localPosition -= (offset * 1.01);
-            box2.root->localPosition += (offset * 1.01);
+            offset *= 0.5f;
+            box1.root->localPosition -= (offset * 1.01f);
+            box2.root->localPosition += (offset * 1.01f);
         }
         //Only one is movable at this stage
         else if (box1.isStatic) {
@@ -599,7 +599,7 @@ void DetectCollisions()
                         box2->object->mass,
                         box1->object->velocity,
                         box2->object->velocity,
-                        1.0
+                        1.0f
                     );
                 }
             }
@@ -646,7 +646,7 @@ void DetectCollisions()
                             sphere2->object->mass,
                             sphere1->object->velocity,
                             sphere2->object->velocity,
-                            1.0
+                            1.0f
                         );
                     }
                 }
@@ -688,7 +688,7 @@ void DetectCollisions()
                             plane->object->mass,
                             sphere1->object->velocity,
                             plane->object->velocity,
-                            1.0
+                            1.0f
                         );
                     }
                 }
@@ -754,7 +754,7 @@ public:
         // Prevent recalculating a random vector every call.
         static Vec3 randomDirection = RandomDirection();
 
-        Vec3 rayZ = direction * -1.0;
+        Vec3 rayZ = direction * -1.0f;
         if (rayZ == randomDirection) {
             randomDirection = RandomDirection();
         }
@@ -890,7 +890,7 @@ static void Physics()
         else if (dampenersActive) {
             velocity += velocity * decel * deltaTime;
         }
-        if (velocity.SqrMagnitude() < 0.0001) {
+        if (velocity.SqrMagnitude() < 0.0001f) {
             velocity = Vec3::zero;
         }
         cam->localPosition += velocity * deltaTime;

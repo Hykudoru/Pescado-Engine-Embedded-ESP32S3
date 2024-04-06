@@ -5,7 +5,8 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <U8g2lib.h>
+
+//#include <U8g2lib.h>
 #include <rm67162.h>
 #include <TFT_eSPI.h>
 
@@ -55,9 +56,9 @@ void Debug()
 {
     //debugging
     DEBUGGING = false;
-    static double coutTimer = 0;
+    static float coutTimer = 0;
     coutTimer += deltaTime;
-    if (coutTimer > 0.25 && coutTimer < 0.25 + deltaTime)
+    if (coutTimer > 0.5f && coutTimer < 0.5f + deltaTime)
     {
         DEBUGGING = true;
         coutTimer = 0;
@@ -67,7 +68,7 @@ void Debug()
     {
         std::cout << "--------GRAPHICS-------" << endl;
         std::cout << "FPS:" << fps << std::endl;
-        std::cout << "Frame Time:" << 1.0 / (double)fps << std::endl;
+        std::cout << "Frame Time:" << 1.0f / (float)fps << std::endl;
         std::cout << "Meshes:" << Mesh::count << std::endl;
         std::cout << "Triangles Drawn:" << Mesh::worldTriangleDrawCount << std::endl;
         std::cout << "FOV:" << fieldOfViewDeg << std::endl;
@@ -166,14 +167,15 @@ void Init()
 
 void Update()
 {
-   float rotationSpeed = (PI / 2) * deltaTime;
+   static float shipRotationSpeed = -(PI / 10.0f);
    if (spaceShip4)
    {
-    spaceShip4->localRotation = Matrix3x3::RotY(-(PI / 10) * deltaTime) * spaceShip4->localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    spaceShip4->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip4->localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
    }
-    cube2.localRotation = Matrix3x3::RotX(rotationSpeed) * cube2.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-    cube3.localRotation = Matrix3x3::RotY(-rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube3.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
-    cube4.localRotation = Matrix3x3::RotY(2*rotationSpeed) * Matrix3x3::RotZ(rotationSpeed) * cube4.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+   float rot = (PI / 2.0f) * deltaTime;
+    cube2.localRotation = Matrix3x3::RotX(rot) * cube2.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube3.localRotation = Matrix3x3::RotY(-rot) * Matrix3x3::RotZ(rot) * cube3.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    cube4.localRotation = Matrix3x3::RotY(2.0f*rot) * Matrix3x3::RotZ(rot) * cube4.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
 }
 
 TaskHandle_t Core0Task;
@@ -196,9 +198,9 @@ void Core1(void * param)
   {
     Time2();
     display.fillSprite(TFT_BLACK);
-    Draw();
     display.drawString(String("Core 0 [")+fps+" fps]", 20,20,4);
     display.drawString(String("Core 1 [")+fps2+" fps]", 20,50,4);
+    Draw();
     lcd_PushColors(0, 0, 536, 240, (uint16_t*)display.getPointer());
   }
 }
@@ -242,7 +244,7 @@ void setup()
     "Core 0 Task", // name of task
     10000, // stack size in words
     NULL, // task params
-    17, //Priority
+    1, //Priority
     &Core0Task, // TaskHandle_t
     0 // core
   );
@@ -250,9 +252,9 @@ void setup()
   xTaskCreatePinnedToCore(
     Core1, // TaskFunction_t
     "Core 1 Task", // name of task
-    10000, // stack size in words
+    100000, // stack size in words
     NULL, // task params
-    17, //Priority
+    2, //Priority
     &Core1Task, // TaskHandle_t
     1 // core
   );

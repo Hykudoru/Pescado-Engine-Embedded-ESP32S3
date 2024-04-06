@@ -7,7 +7,7 @@
 #define List std::vector
 extern bool DEBUGGING;
 //const float PI = 3.14159265359f;
-const float TAO = 2.0 * PI;
+const float TAO = 2.0f * PI;
 typedef void (*Callback)();
 
 template <typename T>
@@ -103,28 +103,28 @@ struct Plane
             verts[2] = pointOnPlane + Vec3(-1, 1, 0);
             return;
         }
-        else if (normal.x == 0.0 && normal.y == 1.0 && normal.z == 0.0)
+        else if (normal.x == 0.0f && normal.y == 1.0f && normal.z == 0.0f)
         {
             verts[1] = pointOnPlane + Vec3(1, 0, 1);
             verts[2] = pointOnPlane + Vec3(-1, 0, 1);
             return;
         }
-        else if (normal.x == 1.0 && normal.y == 0.0 && normal.z == 0.0)
+        else if (normal.x == 1.0f && normal.y == 0.0f && normal.z == 0.0f)
         {
             verts[1] = pointOnPlane + Vec3(0, 1, 1);
             verts[2] = pointOnPlane + Vec3(0, -1, 1);
             return;
         }
 
-        if (normal.x != 0.0) {
+        if (normal.x != 0.0f) {
             x = D / normal.x;
             verts[0] = Vec3(x, 0, 0);
         }
-        if (normal.y != 0.0) {
+        if (normal.y != 0.0f) {
             y = D / normal.y;
             verts[0] = Vec3(0, y, 0);
         }
-        if (normal.x != 0.0) {
+        if (normal.x != 0.0f) {
             z = D / normal.z;
             verts[0] = Vec3(0, 0, z);
         }
@@ -180,16 +180,16 @@ Vec3 RandomDirection()
 }
 
 float ToDeg(float rad) {
-    return rad * 180.0 / PI;
+    return rad * 180.0f / PI;
 }
 
 float ToRad(float deg) {
-    return deg * PI / 180.0;
+    return deg * PI / 180.0f;
 }
 
 Vec3 Reflect(Vec3 v, Vec3 n)
 {
-    return v + (n*2 * DotProduct(v*-1, n));
+    return v + (n*2.0f * DotProduct(v*-1.0f, n));
 }
 
 Vec3 ProjectOnPlane(Vec3 v, Vec3 n)
@@ -258,7 +258,7 @@ bool LinePlaneIntersecting(Vec3& lineStart, Vec3& lineEnd, Plane& plane, Vec3* p
     Vec3 pointPlane = plane.verts[0];
     Vec3 v = lineEnd - lineStart;
     float divisor = DotProduct(n, v);
-    if (divisor != 0.0) 
+    if (divisor != 0.0f) 
     {
         float t = DotProduct(n, pointPlane - lineStart) / divisor;    
         //if (t >= 0.0)
@@ -277,14 +277,14 @@ bool PointInsideTriangle(const Vec3& p, const Vec3 triPoints[3])
     Vec3 C = triPoints[2];
     float divisor = (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x)));
     float divisor2 = (C.y - A.y);
-    if (divisor == 0.0 || divisor2 == 0.0)
+    if (divisor == 0.0f || divisor2 == 0.0f)
     {
         return false;
     }
     float w1 = (((p.x - A.x) * (C.y - A.y)) - ((p.y - A.y) * (C.x - A.x))) / divisor;
     float w2 = ((p.y - A.y) - (w1 * (B.y - A.y))) / divisor2;
 
-    return ((w1 >= 0.0 && w2 >= 0.0) && (w1 + w2) <= 1.0);
+    return ((w1 >= 0.0f && w2 >= 0.0f) && (w1 + w2) <= 1.0f);
 }
 
 //Needs Testing

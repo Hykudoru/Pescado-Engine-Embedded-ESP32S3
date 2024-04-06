@@ -72,7 +72,7 @@ public:
     void Normalize()
     {
         float length = this->Magnitude();
-        if (length < 0.00001) {
+        if (length < 0.00001f) {
             x = 0;
             y = 0;
         }
@@ -134,7 +134,7 @@ public:
 
     Vector2& operator/=(const T divisor)
     {
-        if (divisor != 0.0) {
+        if (divisor != 0.0f) {
             this->x /= divisor;
             this->y /= divisor;
         }
@@ -213,7 +213,7 @@ public:
     void Normalize()
     {
         float length = this->Magnitude();
-        if (length != 0.0) 
+        if (length != 0.0f) 
         {
             x /= length;
             y /= length;
@@ -225,7 +225,7 @@ public:
     {
         float length = this->Magnitude();
         Vector3<T> norm;
-        if (length != 0.0)
+        if (length != 0.0f)
         {
             norm.x = x/length;
             norm.y = y/length;
@@ -284,7 +284,7 @@ public:
 
     Vector3& operator/=(const T divisor)
     {
-        if (divisor != 0.0)
+        if (divisor != 0.0f)
         {
             this->x /= divisor;
             this->y /= divisor;
@@ -308,9 +308,9 @@ Vector3<T> Vector3<T>::one = { 1, 1, 1 };
 template <typename T>
 Vector3<T>::Vector3()
 {
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
+    x = 0.0f;
+    y = 0.0f;
+    z = 0.0f;
 }
 template <typename T>
 Vector3<T>::Vector3(T xVal, T yVal, T zVal)
@@ -350,10 +350,10 @@ public:
 template <typename T>
 Vector4<T>::Vector4()
 {
-    x = 0.0;
-    y = 0.0;
-    z = 0.0;
-    w = 1.0;
+    x = 0.0f;
+    y = 0.0f;
+    z = 0.0f;
+    w = 1.0f;
 }
 template <typename T>
 Vector4<T>::Vector4(T x, T y, T z, T w)
