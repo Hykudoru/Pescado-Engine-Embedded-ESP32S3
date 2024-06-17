@@ -17,7 +17,8 @@ If using blender, Export > Wavefront (.obj). Make sure the exported options are 
 - Colors: True
 - Triangulated Mesh: True
   
-Materials
+<h3>Materials</h3>
+
 - Export: True
 
 <h2>Instructions/Gotchas</h2>
