@@ -7,6 +7,18 @@ Version 2.0
 - x2 SparkFun Qwiic Joysticks --> https://www.sparkfun.com/products/15168
 - x1 SparkFun Qwiic Mux Breakout - 8 Channel (TCA9548A) --> https://www.sparkfun.com/products/16784
 
+<h2>.OBJ Format</h2>
+If using blender, Export > Wavefront (.obj). Make sure the exported options are selected:
+<h3>Geometry</h3>
+
+- Scale: 1.0
+- Forward Axis: -Z
+- Up Axis: Y
+- Colors: True
+- Triangulated Mesh: True
+  
+Materials
+- Export: True
 
 <h2>Instructions/Gotchas</h2>
 
