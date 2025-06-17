@@ -32,4 +32,11 @@ If using blender, Export > Wavefront (.obj). Make sure the exported options are 
      return;
     }</code>
 
+<b>Follow Steps for the LILYGO T-Display-S3</b>
+- Step 1. Compile
+- Step 2. Plug in USB
+- Step 3. (While OLD program running) Hold Boot, Hold Reset, Release Reset, Release Boot
+- Step 4. Upload
+- Step 5. When uploading is finished, Press Reset
+  
 <b>Note:</b> When the program starts, if you still see a black screen after ~15 seconds you may need to try a few things. Option 1: Restart the device. Option 2: Disconnect it from your computer and use some other power source. Option 3: Open the serial monitor in VS code. Option 4: Pray. 
