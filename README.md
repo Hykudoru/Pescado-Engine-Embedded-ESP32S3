@@ -6,6 +6,7 @@ Version 2.0
 - Board/Display: LILYGO T-Display-S3 ESP32-S3 --> https://www.amazon.com/dp/B0C2T6DP5J?ref=ppx_yo2ov_dt_b_product_details&th=1
 - x2 SparkFun Qwiic Joysticks --> https://www.sparkfun.com/products/15168
 - x1 SparkFun Qwiic Mux Breakout - 8 Channel (TCA9548A) --> https://www.sparkfun.com/products/16784
+- For the the "VR" version that uses the MPU6050, go to the HMD branch.
 
 <h2>.OBJ Format</h2>
 If using blender, Export > Wavefront (.obj). Make sure the exported options are selected:
