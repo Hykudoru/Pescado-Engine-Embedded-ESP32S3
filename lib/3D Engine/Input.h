@@ -124,6 +124,55 @@ static void Input()
     {
         return;
     }
+
+    moveDir = Vec3(0, 0, 0);
+
+    //----------Camera Controls-------
+    // FORWARD
+    if (key == 'w') {
+        moveDir += cam->Forward();
+    }
+    // BACK
+    if (key == 's') {
+        moveDir += cam->Back();
+    }
+    // LEFT
+    if (key == 'a') {
+        moveDir += cam->Left();
+    }
+    // RIGHT
+    if (key == 'd') {
+        moveDir += cam->Right();
+    }
+
+    moveDir.Normalize();
+
+    float rate = rotateSpeed * deltaTime;
+    // LOOK UP
+    if (key == '[') {
+        cam->localRotation *= Matrix3x3::RotX(rate);
+    }
+    // LOOK DOWN
+    if (key == '\'') {
+        cam->localRotation *= Matrix3x3::RotX(-rate);
+    }
+    // TURN LEFT
+    if (key == ';') {
+        cam->localRotation *= Matrix3x3::RotY(rate);
+    }
+    // TURN RIGHT|
+    if (key == '\\') {
+        cam->localRotation *= Matrix3x3::RotY(-rate);
+    }
+    
+    // Speed 
+    if (key == 'W' || key == 'A' || key == 'S' || key == 'D')
+    {
+        accel = defaultAcceleration * 5;
+    } else {
+        accel = defaultAcceleration;
+    }
+
     switch (key)
     {
     //Reset Camera
@@ -158,7 +207,6 @@ static void Input()
                 mesh->localPosition = Camera::main->localPosition + (Camera::main->Forward() * 10);
                 mesh->localRotation = Camera::main->localRotation;
             }
-
        }
         break;
     case '8':  //Sphere
