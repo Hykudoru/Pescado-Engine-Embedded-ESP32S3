@@ -10,7 +10,6 @@
 #include <rm67162.h>
 #include <TFT_eSPI.h>
 
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -48,7 +47,6 @@ const int LEFT_JOYSTICK_MUX_PORT = 0;
 const int RIGHT_JOYSTICK_MUX_PORT = 3;
 MuxJoystick leftJoystick(LEFT_JOYSTICK_MUX_PORT, false, false);
 MuxJoystick rightJoystick(RIGHT_JOYSTICK_MUX_PORT, false, false);
-
 
 // Checking if DEBUGGING true in other scripts before using cout also ensures readable slow incremental output.
 bool DEBUGGING = false;
@@ -98,9 +96,9 @@ void Init()
   Graphics::debugAxes = true;
   Physics::collisionDetection = false;
   FOV(60);
-  cube2.color = Color::green;
-  cube3.color = Color::red;
-  cube4.color = Color::yellow;
+  cube2.SetColor(Color::green);
+  cube3.SetColor(Color::red);
+  cube4.SetColor(Color::yellow);
   //Mesh* cube0 = new CubeMesh(1, Vec3(0, 0, 0));
   //Mesh* cube1 = new CubeMesh(1, Vec3(0, 0, -10));
    // CubeMesh* cube = new CubeMesh(1, Vec3());
@@ -118,19 +116,14 @@ void Init()
     textHelloWorld->color = &RGB::green;
     
     
-    spaceShip = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
-    spaceShip->position = Direction::left * 30 + Direction::forward * 10;
-
-    spaceShip2 = LoadMeshFromOBJFile("SpaceShip_3.obj");
-    spaceShip2->position = Direction::right * 40 + Direction::forward * 100;
-    spaceShip2->rotation = Matrix3x3::RotY(PI);
-
-    spaceShip3 = LoadMeshFromOBJFile("SpaceShip_5.obj");
-    spaceShip3->position = Direction::right * 20 + Direction::up * 10;
     */
 
+  // spaceShip2 = LoadMeshFromOBJFile("SpaceShip_3.obj");
+  // spaceShip2->localPosition = Direction::left * 10;
+    
   spaceShip4 = LoadMeshFromOBJFile("SpaceShip_2.2.obj");
-  spaceShip4->localPosition = Direction::forward * 10;
+  spaceShip4->SetColor(Color::red);
+  spaceShip4->localPosition = Direction::forward * 8;
 /*
  
     Mesh* parent = new CubeMesh();
@@ -168,9 +161,21 @@ void Init()
 void Update()
 {
    static float shipRotationSpeed = -(PI / 10.0f);
+   if (spaceShip)
+   {
+    spaceShip->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip->localRotation;
+   }
+   if (spaceShip2)
+   {
+    spaceShip2->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip2->localRotation;
+   }
+   if (spaceShip3)
+   {
+    spaceShip3->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip3->localRotation;
+   }
    if (spaceShip4)
    {
-    spaceShip4->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip4->localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
+    spaceShip4->localRotation = Matrix3x3::RotY(shipRotationSpeed * deltaTime) * spaceShip4->localRotation;
    }
    float rot = (PI / 2.0f) * deltaTime;
     cube2.localRotation = Matrix3x3::RotX(rot) * cube2.localRotation;// *spaceShip2->rotation;// MatrixMultiply(YPR(angle * ((screenWidth / 2)), angle * -((screenWidth / 2)), 0), Mesh.meshes[1].rotation);
